@@ -7,9 +7,11 @@ library(openCyto)
 library(data.table)
 library(ggplot2)
 library(gdata)
+library(gridExtra)
+library(latticeExtra)
 
-path <- '/home/pvan'
-dataPath <- '/home/pvan/data/flowProject/'
+path <- '/home/pvan/flowProject'
+dataPath <- '/home/pvan/flowProject/data'
 setwd(path)
 
 # this project has each patient's data under a separate dir named for the patientID
@@ -17,6 +19,7 @@ setwd(path)
 fcs_files <- list.files(path, recursive=TRUE, pattern="fcs")
 ptids <- list.files(dataPath)
 
+# read in Excel sheet containing metadata 
 meta <- read.xls("clinical_data.xlsx")
 meta$controller_status <- gsub(" ", "", meta$controller_status)
 meta$has_data <- gsub(" ", "", meta$has_data)
@@ -59,17 +62,18 @@ fr1 <- fs[["sample1.fcs"]]
 tlist <- estimateLogicle(fr1, channels = chnls, type = "data")
 fs_trans <- transform(fs_trans, tlist)
 
-# # compare before-vs-after transformation, after should 
+# # compare before-vs-after transformation, "after" version should be more spread out 
 p0 <- densityplot(~Rh103Di, fs[1], main="CD3 marker, raw data", margin=T)
 p1 <- densityplot(~Rh103Di, fs_trans[1], main="logicle transformed", margin=T)
+grid.arrange(p0,p1, nrows=2)
 
-# transformation looks good, make an empty (ungated) gatingSet from our transform data
+# transformation looks good, make an empty (no gates) gatingSet from our transformed data
 gs <- GatingSet(fs_trans)
 
-# gatingSets ues phenoData structure from bioC to store metadata
+# gatingSets uses phenoData structure from bioC to store metadata
 pd <- pData(gs)
 
-# clean things up and flag samples with their stimulation
+# clean metadata and flag samples with their stimulation
 # can also conceivably get this from .fcs file headers using flowCore:::read.FCSheader()
 # but users rarely fill this out
 
@@ -82,6 +86,7 @@ pd$antigen[grep("neg|unstim|NA|na", pd$name, )] <- "unstim"
 
 pd <- merge(pd, meta[,.(ptid,controller_status,neut_status)], by="ptid")
 
+# write the metadata to the gatingSet
 pData(gs) <- pd
 
 # save the gatingSet, breathe sigh of relief that you have survived this far
@@ -95,14 +100,23 @@ gtFile <- "cyTOF_gt.csv"
 gt <- gatingTemplate(gtFile)
 
 # perform gating using the template. Good things come to those who wait while gating() runs
+# can also optionally gate from a particular gate in the hierarchy downstream
+
 gating(gt, gs
        , mc.cores = 4
        , parallel_type = "multicore"
        #, start ="dna"
 )
 
-# optionally remove a gate
+# example of removing a gate. After this when we run gating() again, first gate to be gated
+# will be CD3
 Rm("CD3", gs)
 
 # consult plotGate's extensive help for further plotting shenanigans
+# also Mike Jiang's excellent example page : https://rpubs.com/wjiang2/plotGate
+
 plotGate(gs, "CD3", type="densityplot")
+
+plotGate(gs[["first_fcs_file.fcs"]], "CD3", main="example of one sample's 2D gate")
+ 
+useOuterStrips(plotGate(gs, "live", type="densityplot",  cond="stim+ptid", main="faceted by stimulation and patientID from pData"))
