@@ -73,7 +73,7 @@ gs <- GatingSet(fs_trans)
 # gatingSets uses phenoData structure from bioC to store metadata
 pd <- pData(gs)
 
-# clean metadata and flag samples with their stimulation
+# clean metadata and flag samples with their stimulation, so we can facet later
 # can also conceivably get this from .fcs file headers using flowCore:::read.FCSheader()
 # but users rarely fill this out
 
@@ -108,15 +108,16 @@ gating(gt, gs
        #, start ="dna"
 )
 
-# example of removing a gate. After this when we run gating() again, first gate to be gated
-# will be CD3
+# get some population statistics
+getPopStats(gs)
+getProp(gs[["first_fcs_file.fcs"]], "CD3")
+
+# example of removing a gate. Afterwards when we run gating() again, first gate to be gated will be CD3
 Rm("CD3", gs)
 
-# consult plotGate's extensive help for further plotting shenanigans
-# also Mike Jiang's excellent example page : https://rpubs.com/wjiang2/plotGate
+# some basic plotting, details and examples at:
+# http://www.bioconductor.org/packages/release/bioc/vignettes/flowWorkspace/inst/doc/plotGate.html
 
 plotGate(gs, "CD3", type="densityplot")
-
 plotGate(gs[["first_fcs_file.fcs"]], "CD3", main="example of one sample's 2D gate")
- 
 useOuterStrips(plotGate(gs, "live", type="densityplot",  cond="stim+ptid", main="faceted by stimulation and patientID from pData"))
