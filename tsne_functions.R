@@ -3,11 +3,12 @@ library(ggplot2)
 library(RColorBrewer)
 library(gridExtra)
 library(dbscan)
+library(sp)
 
 # plots the output of a tsne row on ICS flow data, highlights user-specified window, and return 
 # cell events within that window
 
-extract_tsne_region <- function(dat, x_min, x_max, y_min, y_max, antigen, facet) {
+extract_tsne_rect <- function(dat, x_min, x_max, y_min, y_max, antigen, facet) {
   fct <- as.symbol(facet)
   
   dat <- subset(dat, stim==antigen)
@@ -27,8 +28,10 @@ extract_tsne_region <- function(dat, x_min, x_max, y_min, y_max, antigen, facet)
   return(tmp)
 }
 
+
 cluster_with_dbscan <- function(dat, epsilon, minpts = 5 ) {
   out <- dbscan(dat[,.(x,y)], eps = epsilon)
   dat[,"dbscan_cluster"] <- out$cluster
   return(dat)
 }
+
