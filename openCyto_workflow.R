@@ -16,13 +16,11 @@ dataPath <- '/home/pvan/flowProject/data'
 setwd(path)
 
 # this project has each patient's data under a separate dir named for the patientID
-
 fcs_files <- list.files(path, recursive=TRUE, pattern="fcs")
 ptids <- list.files(dataPath)
 
 # read in Excel sheet containing metadata 
 # this example has clinical variables "controller_status", among others
-
 meta <- read.xls("clinical_data.xlsx")
 meta$controller_status <- gsub(" ", "", meta$controller_status)
 meta$has_data <- gsub(" ", "", meta$has_data)
@@ -49,7 +47,6 @@ names(chnls) <- markers$desc
 
 # estimate parameters of the logicle transformation from the data,
 # then transform flowSet 
-
 fs_trans <- fs[seq(along=fs)]
 fr1 <- fs[["sample1.fcs"]]
 tlist <- estimateLogicle(fr1, channels = chnls, type = "data")
@@ -63,13 +60,20 @@ grid.arrange(p0,p1, nrows=2)
 # transformation looks good, make an empty (no gates) gatingSet from our transformed data
 gs <- GatingSet(fs_trans)
 
+# you should index explicitly by sample name when referring to flowSets and gatingSets
+# since numeric indices could change
+sampleNames(fs)
+sampleNames(gs) # should be the same, both should match pData(fs) or pData(gs)
+fs[['first_fcs_file.fcs']] # good 
+fs[[1]] # BAD !
+fs[c(1:10)] # WORSE !!! These are likely NOT the samples you think they are
+
 # gatingSets uses phenoData structure from bioC to store metadata
 pd <- pData(gs)
 
 # clean metadata and flag samples with their stimulation, so we can facet later
 # can also conceivably get this from .fcs file headers using flowCore:::read.FCSheader()
 # but users rarely fill this out
-
 pd$ptid <- pd$name
 pd$ptid <- substr(pd$ptid, start=0, stop=6)
 pd$antigen[grep("ENV|Env|env", pd$name )] <- "ENV"
@@ -85,7 +89,6 @@ pData(gs) <- pd
 # save the gatingSet, breathe sigh of relief that you have survived this far
 # note that at this point you have created a gatingSet, but since 
 # you have not gated your data, this gatingSet is empty
-
 save_gs(gs, "output/gs_auto")
 
 # read gatingSet back in
@@ -132,7 +135,8 @@ flowWorkspace.par.set("plotGate", list("type" = "histogram"))
 # removing a gate will also remove all downstream gates
 Rm("CD4+", gs)
 
-# some basic plotting, details and examples at:
+# some basic plotting,  plotGate() uses R lattice graphics 
+# more details and examples at:
 # http://www.bioconductor.org/packages/release/bioc/vignettes/flowWorkspace/inst/doc/plotGate.html
 plotGate(gs, "CD3", type="densityplot")
 plotGate(gs[["first_fcs_file.fcs"]], "CD3", main="example of one sample's 2D gate")
@@ -142,6 +146,7 @@ useOuterStrips(plotGate(gs, "live", type="densityplot",  cond="stim+ptid", main=
 # this removes all unstimulated (control) samples, as determined by the gatingSet's phenoData
 # one more reason to fill out your pData(gs) correctly !!!
 gs <- subset(gs, !stim %in% c("unstim") )
+
 
 # changes to the gatingSet are only in memory, so you need to explicitly save.
 # NOTE: you will not a warning when overwrite=TRUE, so be careful !!!
