@@ -33,7 +33,8 @@ extract_tsne_rect <- function(dat, x_min, x_max, y_min, y_max, antigen, marker, 
   
   p1 <- eval(plotCall)
   p2 <- tsne_proportion_boxplots(dat, x_min, x_max, y_min, y_max, antigen, marker, facet)
-  pl <- grid.arrange(p1, p2)
+  p3 <- blankPanel<-grid.rect(gp=gpar(col="white"))
+  pl <- grid.arrange(p1, arrangeGrob(p2,p3, nrow=1), heights=c(1,0.5))
   print(pl)
   return(tmp)
 }
