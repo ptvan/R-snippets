@@ -68,6 +68,10 @@ fs[['first_fcs_file.fcs']] # good
 fs[[1]] # BAD !
 fs[c(1:10)] # WORSE !!! These are likely NOT the samples you think they are
 
+# if you need to refer to lists of samples, do this:
+good_samples <- c("first_fcs_file.fcs", "second_fcs_file.fcs")
+fs[good_samples]
+
 # gatingSets uses phenoData structure from bioC to store metadata
 pd <- pData(gs)
 
