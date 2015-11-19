@@ -144,12 +144,23 @@ flowWorkspace.par.set("plotGate", list("default.y" = "Rh103Di"))
 flowWorkspace.par.set("plotGate", list("type" = "histogram"))
 
 # example of removing a gate. Afterwards when we run gating() again, first gate to be gated will be CD3
-Rm("CD3", gs)
+# removing a gate will also remove all downstream gates
+Rm("CD4+", gs)
 
 # some basic plotting, details and examples at:
 # http://www.bioconductor.org/packages/release/bioc/vignettes/flowWorkspace/inst/doc/plotGate.html
-
 plotGate(gs, "CD3", type="densityplot")
 plotGate(gs[["first_fcs_file.fcs"]], "CD3", main="example of one sample's 2D gate")
 useOuterStrips(plotGate(gs, "live", type="densityplot",  cond="stim+ptid", main="density plot faceted by stimulation and patientID from pData"))
+
+# you can also exclude samples from the gatingSet by subsetting
+# this removes all unstimulated (control) samples, as determined by the gatingSet's phenoData
+# one more reason to fill out your pData(gs) correctly !!!
+gs <- subset(gs, !stim %in% c("unstim") )
+
+# changes to the gatingSet are only in memory, so you need to explicitly save.
+# NOTE: you will not an overwrite warning when overwrite=TRUE, so be careful !!!
+save_gs(gs, "output/gs_auto", overwrite=TRUE)
+
+
 
