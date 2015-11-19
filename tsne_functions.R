@@ -6,15 +6,15 @@ library(dbscan)
 library(sp)
 library(pheatmap)
 
-
-# plots the output of a tsne row on ICS flow data, highlights user-specified window, and return 
-# cell events within that window
+# plots the output of a tsne run on ICS flow data, highlights user-specified window, and return 
+# cell events within that window. Also calls tsne_proportion_boxplot() to perform t.test() on
+# extracted events
 
 extract_tsne_rect <- function(dat, x_min, x_max, y_min, y_max, antigen, marker, facet, title) {
   facet <- as.symbol(facet)
   marker <- as.symbol(marker)
   
-  # marker can be an actual marker (eg. "IFNg") or "degree")
+  # `marker` argument can be an actual marker (eg. "IFNg") or "degree" 
   
   dat <- subset(dat, stim==antigen)
   tmp <- subset(dat, x>x_min&x<x_max&y>y_min&y<y_max)
@@ -26,11 +26,9 @@ extract_tsne_rect <- function(dat, x_min, x_max, y_min, y_max, antigen, marker, 
                            labs(title = title) +
                            facet_grid(fct ~ .) + 
                            scale_color_gradientn(colours = rev(brewer.pal(11, "Spectral"))) 
-                           
                          ,
                          list(fct = facet, mkr = marker)
   )
-  
   
   p1 <- eval(plotCall)
   p2 <- tsne_proportion_boxplots(dat, x_min, x_max, y_min, y_max, antigen, marker, facet)
@@ -40,7 +38,7 @@ extract_tsne_rect <- function(dat, x_min, x_max, y_min, y_max, antigen, marker, 
   return(tmp)
 }
 
-
+# performs a t.test() on extracted events
 tsne_proportion_boxplots <- function(dat, x_min, x_max, y_min, y_max, antigen, marker, facet) {
   m <- unique(dat[,.(ptid,neut_status,controller_status)])
   totals <- dat[, length(x), by=ptid]
