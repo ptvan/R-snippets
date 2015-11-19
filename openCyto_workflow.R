@@ -37,6 +37,8 @@ fs  <- read.ncdfFlowSet(fcs_files, ncdfFile = file.path(path, "output", "flowPro
 
 # get marker/channel information from the flowSet
 markers <- pData(parameters(fs[[1]]))  
+markers <- markers[,c(1:2)]
+markers <- data.table(markers)
 
 # make list of channels that need to be transformed
 chnls <- as.vector(markers$name)
@@ -64,7 +66,7 @@ gs <- GatingSet(fs_trans)
 # gatingSets uses phenoData structure from bioC to store metadata
 pd <- pData(gs)
 
-# example of cleaning metadata and flagging samples with their stimulation, so we can facet later
+# clean metadata and flag samples with their stimulation, so we can facet later
 # can also conceivably get this from .fcs file headers using flowCore:::read.FCSheader()
 # but users rarely fill this out
 
