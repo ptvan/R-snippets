@@ -32,27 +32,11 @@ setkey(meta, ptid)
 
 # read all fcs_files into an ncdfFlowset (uses NetCDF library to store flowSets on disk)
 # regular flowSets are memory-resident and can be huge
+# DO NOT MOVE OR DELETE THIS .cdf FILE OR THINGS WILL BREAK
 fs  <- read.ncdfFlowSet(fcs_files, ncdfFile = file.path(path, "output", "flowProject.cdf"))
 
-# get markers
+# get marker/channel information from the flowSet
 markers <- pData(parameters(fs[[1]]))  
-markers <- markers[!is.na(markers$desc),]
-markers <- markers[!grepl("bead",markers$desc),]
-markers <- markers[,c(1:2)]
-markers <- data.table(markers)
-
-cytokines <- c("TNFa", 
-               "IFNg", 
-               "IL-2", 
-               "IL-4", 
-               "IL-17", 
-               "IL-21",
-               "Perforin",
-               "GrzA",
-               "GrzB",
-               "CD154",
-               "CD107"
-)
 
 # make list of channels that need to be transformed
 chnls <- as.vector(markers$name)
@@ -80,7 +64,7 @@ gs <- GatingSet(fs_trans)
 # gatingSets uses phenoData structure from bioC to store metadata
 pd <- pData(gs)
 
-# clean metadata and flag samples with their stimulation, so we can facet later
+# example of cleaning metadata and flagging samples with their stimulation, so we can facet later
 # can also conceivably get this from .fcs file headers using flowCore:::read.FCSheader()
 # but users rarely fill this out
 
@@ -111,7 +95,6 @@ gt <- gatingTemplate(gtFile)
 
 # perform gating using the template. Good things come to those who wait while gating() runs
 # can also optionally gate from a particular gate in the hierarchy downstream
-
 gating(gt, gs
        , mc.cores = 4
        , parallel_type = "multicore"
@@ -159,8 +142,5 @@ useOuterStrips(plotGate(gs, "live", type="densityplot",  cond="stim+ptid", main=
 gs <- subset(gs, !stim %in% c("unstim") )
 
 # changes to the gatingSet are only in memory, so you need to explicitly save.
-# NOTE: you will not an overwrite warning when overwrite=TRUE, so be careful !!!
+# NOTE: you will not a warning when overwrite=TRUE, so be careful !!!
 save_gs(gs, "output/gs_auto", overwrite=TRUE)
-
-
-
