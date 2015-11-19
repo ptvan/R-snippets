@@ -6,10 +6,11 @@ library(dbscan)
 library(sp)
 library(pheatmap)
 
+
 # plots the output of a tsne row on ICS flow data, highlights user-specified window, and return 
 # cell events within that window
 
-extract_tsne_rect <- function(dat, x_min, x_max, y_min, y_max, antigen, marker, facet) {
+extract_tsne_rect <- function(dat, x_min, x_max, y_min, y_max, antigen, marker, facet, title) {
   facet <- as.symbol(facet)
   marker <- as.symbol(marker)
   
@@ -22,7 +23,7 @@ extract_tsne_rect <- function(dat, x_min, x_max, y_min, y_max, antigen, marker, 
                            geom_point(aes(colour = mkr), size = 1, alpha = 0.8) +
                            geom_rect(xmin=x_min, xmax=x_max, ymin=y_min, ymax=y_max, 
                                      color="red",alpha=0) +
-                           labs(title = "tSNE comparison") +
+                           labs(title = title) +
                            facet_grid(fct ~ .) + 
                            scale_color_gradientn(colours = rev(brewer.pal(11, "Spectral"))) 
                            
@@ -33,7 +34,7 @@ extract_tsne_rect <- function(dat, x_min, x_max, y_min, y_max, antigen, marker, 
   
   p1 <- eval(plotCall)
   p2 <- tsne_proportion_boxplots(dat, x_min, x_max, y_min, y_max, antigen, marker, facet)
-  p3 <- blankPanel<-grid.rect(gp=gpar(col="white"))
+  p3 <- grid.rect(gp=gpar(col="white"))
   pl <- grid.arrange(p1, arrangeGrob(p2,p3, nrow=1), heights=c(1,0.5))
   print(pl)
   return(tmp)
