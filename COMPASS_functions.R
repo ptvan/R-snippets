@@ -1,10 +1,14 @@
 library(COMPASS)
 library(data.table)
 
-# extract cell counts from the COMPASS container (CR[[antigen]]$data$count_s)
+# extract cell counts from the COMPASSResult container (CR[[antigen]]$data$count_s)
 # convert it to proportions and export to a format (mostly) readable by SPICE
 
 COMPASS_counts_to_SPICE <- function(CR){
+  
+  if(!is.list(CR) || class(CR[[1]]) != "COMPASSResult") {
+    stop("this function requires a list containing at least 1 COMPASSResult !!!")
+  }
   
   antigens <- names(CR)
   
@@ -52,6 +56,7 @@ COMPASS_counts_to_SPICE <- function(CR){
     }
     big <- rbind(big,p_new)
   }
+  # append
   big$time <- as.factor(big$time)
   big$unstim_proportion <- as.numeric(big$unstim_proportion)
   big$stim_proportion <- as.numeric(big$stim_proportion)
