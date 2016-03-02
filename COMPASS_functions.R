@@ -1,10 +1,15 @@
 library(COMPASS)
 library(data.table)
 
-# extract cell counts from the COMPASSResult container (CR[[antigen]]$data$count_s)
-# convert it to proportions and export to a format (mostly) readable by SPICE
 
-COMPASS_counts_to_SPICE <- function(CR){
+COMPASS_cell_proportions <- function(CR){
+# extract cell counts from the COMPASSResult container (CR[[antigen]]$data$count_s)
+# !!! IMPORTANT: assumes data comes from time-course experiment and therefore has
+# joint_id (<ptid>_<time>)
+  
+# convert it to proportions and export to a format (mostly) readable by SPICE
+# null category is kept, so proportions should be very small since cytokines are rare
+
   
   if(!is.list(CR) || class(CR[[1]]) != "COMPASSResult") {
     stop("this function requires a list containing at least 1 COMPASSResult !!!")
@@ -37,7 +42,7 @@ COMPASS_counts_to_SPICE <- function(CR){
     k <- 0
     for (i in 1:nrow(p)){
       rown <- rownames(p)[i]
-      # since this is time-series, need to split jointID into ptid and time
+      # split jointID into ptid and time
       # eg. "1_0", ptid == 1, time == 0
       
       ptid <- unlist(strsplit(rown, "_"))[1]
@@ -65,12 +70,12 @@ COMPASS_counts_to_SPICE <- function(CR){
 }
 
 
-COMPASS_count_percentages <- function(CR){
+COMPASS_cell_proportions_nonull <- function(CR){
 ## !!! IMPORTANT !!!
 ## This function calculates percentages EXCLUDING THE NULL CATEGORY !!!
-## eg. you 10000 cells that can express IL2 or IFNg
+## eg. you have 10000 cells 
 ## 5 cells express IL2 only, 3 cells express IFNg only, 2 cells express both
-## the percentages are IL2 = 5/10 = 0.5, IFNg = 3/10 = 0.3, IL2+IFNg = 2/10 = 0.2
+## the percentages returned by this fx are IL2 = 5/10 = 0.5, IFNg = 3/10 = 0.3, IL2+IFNg = 2/10 = 0.2
 ## this is different than when the calculation is over ALL cells (10000 in this example)
   
   if(!is.list(CR) || class(CR[[1]]) != "COMPASSResult") {
@@ -91,13 +96,13 @@ COMPASS_count_percentages <- function(CR){
     antigen <- antigens[i]
     cat(antigen, "\n")  
     
-    # get cell counts, remove null category
+    # get cell counts, REMOVE NULL CATEGORY
     p <- as.data.frame(CR[[antigen]]$data$n_s)
     p <- p[,1:ncol(p)-1]
     p_u <- as.data.frame(CR[[antigen]]$data$n_u)
     p_u <- p_u[,1:ncol(p_u)-1]
     
-    # calculate totals
+    # RECALCULATE TOTAL
     totals <- apply(p, 1, sum)
     totals_u <- apply(p_u, 1, sum)
     
