@@ -154,10 +154,9 @@ gs <- subset(gs, !stim %in% c("unstim") )
 # digging a bit deeper, you can select a subset of cells from your gatingSet, 
 # plot their expression of various markers on 2D plots to see if there are any
 # biases/codependencies
-
 fs <- getData(gs)
-# manually create a gate, add it to the gating Hierarchy (just 1 sample to save time)
 xyplot(Ir191Di ~ Pt195Di, fs[[1]] , smooth=F, margin=F)
+# manually create a gate, add it to the gating Hierarchy (just 1 sample to save time)
 g <- rectangleGate(filterId="rect", Pt195Di=c(0,0.4), Ir191Di=c(0,6))
 add(gs[[1]], g, parent="root", name="backgate")
 recompute(gs[[1]], "backgate")
