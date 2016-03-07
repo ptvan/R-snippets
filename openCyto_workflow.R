@@ -166,14 +166,14 @@ xyplot(Ir191Di ~ Pt195Di, fs[[1]] , smooth=F, margin=F)
 # manually create a gate, add it to the gating Hierarchy (just 1 sample to save time)
 g <- rectangleGate(filterId="rect", Pt195Di=c(0,0.4), Ir191Di=c(0,6))
 add(gs[[1]], g, parent="root", name="backgate")
-recompute(gs[[1]], "backgate")
+recompute(gs[['first_fcs_file.fcs']], "backgate")
 # plot the newly-added manual gate
 plotGate(gs[[1]], "backgate", xbin=64)
 # get the cells inside this gate, plot their expression (of CD4 vs. CD8 in this case)
-dat <- getData(gs[[1]], "backgate")
+dat <- getData(gs[['first_fcs_file.fcs']], "backgate")
 xyplot(In115Di ~ Nd145Di, dat , smooth=F, margin=F)
 # alternatively, overlay cells from the new gate on existing gates to see possible trends
-plotGate(gs[[1]], "CD4+CD8-", overlay="backgate",xbin=64)
+plotGate(gs[['first_fcs_file.fcs']], "CD4+CD8-", overlay="backgate",xbin=64)
 
 # changes to the gatingSet are only in memory, so you need to explicitly save.
 # NOTE: you will not a warning when overwrite=TRUE, so be careful !!!
