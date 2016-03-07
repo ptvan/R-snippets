@@ -52,9 +52,16 @@ fr1 <- fs[["sample1.fcs"]]
 tlist <- estimateLogicle(fr1, channels = chnls, type = "data")
 fs_trans <- transform(fs_trans, tlist)
 
+# ... alternatively, since CyTOF data shouldn't have zeros, 
+# you can use flowCore:::arcsinhTransform() eg.
+# x <- asinh(a+b*x) + c, a = shift, b = cofactor
+asinTrans <- arcsinhTransform("cytof_asinh", a=0, b=0.2)
+tlist_asinh <- transformList(chnls, asinTrans)
+fs_trans <- transform(fs_trans, tlist_asinh)
+
 # # compare before-vs-after transformation, "after" version should be more spread out 
 p0 <- densityplot(~Rh103Di, fs[1], main="CD3 marker, raw data", margin=T)
-p1 <- densityplot(~Rh103Di, fs_trans[1], main="logicle transformed", margin=T)
+p1 <- densityplot(~Rh103Di, fs_trans[1], main="transformed", margin=T)
 grid.arrange(p0,p1, nrows=2)
 
 # transformation looks good, make an empty (no gates) gatingSet from our transformed data
