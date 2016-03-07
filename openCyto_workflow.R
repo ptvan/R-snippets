@@ -1,8 +1,10 @@
 # this example workflow reads in .fcs files, creates the associated flowCore-based structures
 # performs gating from scratch (ie. we were not provided gated data, normally flowJo workspaces)
-# the data used is cyTOF, so no compensation is needed, only transformation (using logicle transforms)
+# the data used is CyTOF, so no compensation is needed, only transformation 
+# it also demonstrates some features of openCyto and the associated flow packages
 
-# Phu T. Van, Gottardo Lab, FHCRC, September 2015
+# Phu T. Van, Gottardo Lab, FHCRC, first created September 2015
+# edited and expanded sporadically since
 
 library(openCyto)
 library(data.table)
@@ -19,7 +21,7 @@ setwd(path)
 fcs_files <- list.files(path, recursive=TRUE, pattern="fcs")
 ptids <- list.files(dataPath)
 
-# read in Excel sheet containing metadata 
+# read in Excel sheet containing metadata using gdata:::read.xls()
 # this example has clinical variables "controller_status", among others
 meta <- read.xls("clinical_data.xlsx")
 meta$controller_status <- gsub(" ", "", meta$controller_status)
