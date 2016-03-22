@@ -124,6 +124,7 @@ plot(gs)
 
 # get some population statistics
 getPopStats(gs)
+getPopStats(gs, sub="CD4+")
 getProp(gs[["first_fcs_file.fcs"]], "CD3")
 
 # gatingSets only contain the gates, the flow event data are stored in flowSets
