@@ -14,15 +14,18 @@ plotpca <- function (df, title=NULL, labels=NULL, varname.adjust=2) {
     cat("length of `labels` did not match rows of input, groups will not be colored in biplot !\n")
     labels <- NULL
   }
-  
+  # plotting
   if (is.null(labels)){
     # no labels
-    out <- ggbiplot(pcobj,...)
+    out <- ggbiplot(pcobj,...) +
+    ggtitle(title)
+    
   } else {
-  out <- ggbiplot(pcobj, groups=labels) +
+    
+    out <- ggbiplot(pcobj, groups=labels, ...) +
     ggtitle(title) +
     geom_text(aes(label=labels))
   }
-  out  
+  print(out)  
   return(out)
 }
