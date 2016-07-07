@@ -119,6 +119,12 @@ gating(gt, gs
        #, start ="dna"
 )
 
+## ALTERNATIVELY, you can read in a GatingML HIERARCHY (eg. from Cytobank)
+
+library(CytoML)
+xmlfile <- system.file("my_Cytobank_GatingML_file.xml")
+gs <- cytobank2GatingSet(xmlfile, fcs_files) # using the same fcs_files above
+
 # plots the gating hierarchy, which now shouldn't be empty
 plot(gs)
 

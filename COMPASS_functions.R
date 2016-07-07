@@ -74,7 +74,7 @@ COMPASS_cell_proportions_nonull <- function(CR){
 ## !!! IMPORTANT !!!
 ## This function calculates percentages EXCLUDING THE NULL CATEGORY !!!
 ## eg. you have 10000 cells 
-## 5 cells express IL2 only, 3 cells express IFNg only, 2 cells express both
+## 5 cells express IL2 only, 3 cells express IFNg only, 2 cells express both (10 cells express any)
 ## the percentages returned by this fx are IL2 = 5/10 = 0.5, IFNg = 3/10 = 0.3, IL2+IFNg = 2/10 = 0.2
 ## this is different than when the calculation is over ALL cells (10000 in this example)
   
