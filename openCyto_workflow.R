@@ -119,7 +119,7 @@ gating(gt, gs
        #, start ="dna"
 )
 
-## ALTERNATIVELY, you can read in a GatingML HIERARCHY (eg. from Cytobank)
+## ALTERNATIVELY, you can read in a gating hierarchy from GatingML (eg. from Cytobank)
 
 library(CytoML)
 xmlfile <- system.file("my_Cytobank_GatingML_file.xml")
@@ -183,6 +183,14 @@ dat <- getData(gs[['first_fcs_file.fcs']], "backgate")
 xyplot(In115Di ~ Nd145Di, dat , smooth=F, margin=F)
 # alternatively, overlay cells from the new gate on existing gates to see possible trends
 plotGate(gs[['first_fcs_file.fcs']], "CD4+CD8-", overlay="backgate",xbin=64)
+
+# use ggcyto to plot using ggplot2 syntax
+# NOTE: ggcyto is meant to make quick plots for a few samples, mostly for
+# publication, plotting an entire gatingSet will be EXTREMELY SLOW !!!
+ 
+library(ggcyto)
+autoplot(gs, c("CD4", "CD8"), bins=64) # basic 2D plot
+ggplot(fs, aes(x = `<Nd145Di>`, y = `<In115Di>`)) + facet_wrap(~name) + geom_hex(bins = 64)
 
 # changes to the gatingSet are only in memory, so you need to explicitly save.
 # NOTE: you will not a warning when overwrite=TRUE, so be careful !!!
