@@ -22,7 +22,7 @@ COMPASS_cell_proportions <- function(CR){
   cytokines <- cytokines[-length(cytokines)]
   
   # create the big data.frame to be returned later
-  big <- data.frame(matrix(vector(),0, length(cytokines)+6))
+  big <- data.frame(matrix(vector(),0, length(cytokines)+5))
   colnames(big) <- c("ptid","time",cytokines,"unstim_proportion" ,"stim_proportion","antigen")
   
   # for each antigen in the COMPASSResult structure...  
@@ -48,10 +48,11 @@ COMPASS_cell_proportions <- function(CR){
       ptid <- unlist(strsplit(rown, "_"))[1]
       time <- unlist(strsplit(rown, "_"))[2]
       
+      # calculate proportions, keeping the antigen combinations
       for (j in 1:ncol(p)){ # NOTE: this assumes count_s & count_u have same dimensions
         coln <- colnames(p)[j]
         x <- unlist(strsplit(coln, "&"))
-        vec <- rep("+", 5)
+        vec <- rep("+", length(antigens))
         vec[grep("\\!", x)] = "-"
         vec <- c(ptid, time, vec, p[i,j] / totals[i], p_u[i,j] / totals_u[i], antigen)
         k <- k+1
@@ -59,9 +60,10 @@ COMPASS_cell_proportions <- function(CR){
         p_new[k,] <- vec 
       }
     }
+    # append to big matrix
     big <- rbind(big,p_new)
   }
-  # append
+  
   big$time <- as.factor(big$time)
   big$unstim_proportion <- as.numeric(big$unstim_proportion)
   big$stim_proportion <- as.numeric(big$stim_proportion)
@@ -116,11 +118,11 @@ COMPASS_cell_proportions_nonull <- function(CR){
       
       ptid <- unlist(strsplit(rown, "_"))[1]
       time <- unlist(strsplit(rown, "_"))[2]
-      
+      # calculate proportions, keeping the antigen combinations
       for (j in 1:ncol(p)){ # NOTE: this assumes count_s & count_u have same dimensions
         coln <- colnames(p)[j]
         x <- unlist(strsplit(coln, "&"))
-        vec <- rep("+", 5)
+        vec <- rep("+", length(antigens))
         vec[grep("\\!", x)] = "-"
         vec <- c(ptid, time, vec, p[i,j] / totals[i], p_u[i,j] / totals_u[i], antigen)
         k <- k+1
@@ -128,9 +130,10 @@ COMPASS_cell_proportions_nonull <- function(CR){
         p_new[k,] <- vec 
       }
     }
+    # append to big matrix
     big <- rbind(big,p_new)
   }
-  # append
+
   big$time <- as.factor(big$time)
   big$unstim_proportion <- as.numeric(big$unstim_proportion)
   big$stim_proportion <- as.numeric(big$stim_proportion)
