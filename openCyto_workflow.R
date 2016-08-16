@@ -21,7 +21,7 @@ setwd(path)
 fcs_files <- list.files(path, recursive=TRUE, pattern="fcs")
 ptids <- list.files(dataPath)
 
-# read in Excel sheet containing metadata using gdata:::read.xls()
+# read in Excel sheet containing metadata, here I used gdata:::read.xls()
 # this example has clinical variables "controller_status", among others
 meta <- read.xls("clinical_data.xlsx")
 meta$controller_status <- gsub(" ", "", meta$controller_status)
@@ -45,7 +45,7 @@ chnls <- as.vector(markers$name)
 names(chnls) <- markers$desc
 
 # for non-cyTOF data you would also need to compensate here...
-# flowCore provides compensate() function, ?flowCore::compensate
+# flowCore provides compensate() function, ?flowCore::compensate for more details
 
 # estimate parameters of the logicle transformation from the data,
 # then transform flowSet 
@@ -107,12 +107,14 @@ save_gs(gs, "output/gs_auto")
 # read gatingSet back in
 gs <- load_gs("output/gs_auto/")
 
-# load gatingTemplate 
+# load gatingTemplate from a .CSV
 gtFile <- "cyTOF_gt.csv"
 gt <- gatingTemplate(gtFile)
 
-# perform gating using the template. Good things come to those who wait while gating() runs
-# can also optionally gate from a particular gate in the hierarchy downstream
+# perform gating using the template. Could take a while if you have a lot of data
+# so definitely do this on a cluster or big multi-core machine if you can
+# Notice we can also optionally gate from a particular gate in the hierarchy
+# to save time if nothing upstream has changed
 gating(gt, gs
        , mc.cores = 4
        , parallel_type = "multicore"
@@ -120,13 +122,13 @@ gating(gt, gs
 )
 
 ## ALTERNATIVELY, you can read in a gating hierarchy from GatingML (eg. from Cytobank)
-
 library(CytoML)
 xmlfile <- system.file("my_Cytobank_GatingML_file.xml")
 gs <- cytobank2GatingSet(xmlfile, fcs_files) # using the same fcs_files above
 
 # plots the gating hierarchy, which now shouldn't be empty
 plot(gs)
+plot(gs, fontsize=16) #useful with too many nodes and names are too small to read
 
 # get some population statistics
 getPopStats(gs)
@@ -140,7 +142,7 @@ getProp(gs[["first_fcs_file.fcs"]], "CD3")
 # this gets you a flowFrame of flow events for the first .fcs file, *DOWNSTREAM* of the `CD4+` gate
 fr <- getData(gs[["first_fcs_file.fcs"]], "CD4+")
 
-# openCyto has various functions for manipulating flowFrames, so safer than others
+# openCyto has various functions for manipulating flowFrames, some safer than others
 fr <- openCyto:::.truncate_flowframe(fr, channels = "Rh103Di", min = 1)
 
 # this plots a histogram of the data using base R
@@ -172,26 +174,29 @@ gs <- subset(gs, !stim %in% c("unstim") )
 # biases/codependencies
 fs <- getData(gs)
 xyplot(Ir191Di ~ Pt195Di, fs[[1]] , smooth=F, margin=F)
+
 # manually create a gate, add it to the gating Hierarchy (just 1 sample to save time)
 g <- rectangleGate(filterId="rect", Pt195Di=c(0,0.4), Ir191Di=c(0,6))
 add(gs[[1]], g, parent="root", name="backgate")
 recompute(gs[['first_fcs_file.fcs']], "backgate")
+
 # plot the newly-added manual gate
 plotGate(gs[[1]], "backgate", xbin=64)
+
 # get the cells inside this gate, plot their expression (of CD4 vs. CD8 in this case)
 dat <- getData(gs[['first_fcs_file.fcs']], "backgate")
 xyplot(In115Di ~ Nd145Di, dat , smooth=F, margin=F)
+
 # alternatively, overlay cells from the new gate on existing gates to see possible trends
 plotGate(gs[['first_fcs_file.fcs']], "CD4+CD8-", overlay="backgate",xbin=64)
 
 # use ggcyto to plot using ggplot2 syntax
 # NOTE: ggcyto is meant to make quick plots for a few samples, mostly for
 # publication, plotting an entire gatingSet will be EXTREMELY SLOW !!!
- 
 library(ggcyto)
 autoplot(gs, c("CD4", "CD8"), bins=64) # basic 2D plot
 ggplot(fs, aes(x = `<Nd145Di>`, y = `<In115Di>`)) + facet_wrap(~name) + geom_hex(bins = 64)
 
-# changes to the gatingSet are only in memory, so you need to explicitly save.
+# changes to the gatingSet are only in memory, so you need to explicitly save changes
 # NOTE: you will not a warning when overwrite=TRUE, so be careful !!!
 save_gs(gs, "output/gs_auto", overwrite=TRUE)
