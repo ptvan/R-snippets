@@ -126,6 +126,16 @@ library(CytoML)
 xmlfile <- system.file("my_Cytobank_GatingML_file.xml")
 gs <- cytobank2GatingSet(xmlfile, fcs_files) # using the same fcs_files above
 
+## MORE ALTERNATIVELY, you can read in a flowJo XML workspace
+# create the workspace object
+ws <- openWorkspace("my_flowJo_workspace.xml")
+
+# parse the workspace
+# default `execute=T` applies transformations,compensations and calculates gates
+# `name` specifies which FlowJo samples to process
+gs <- parseWorkspace(ws , execute=F, name=3)
+
+
 # plots the gating hierarchy, which now shouldn't be empty
 plot(gs)
 plot(gs, fontsize=16) #useful with too many nodes and names are too small to read
