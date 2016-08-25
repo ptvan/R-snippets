@@ -250,13 +250,16 @@ autoplot(gs, c("CD4", "CD8"), bins=64) # basic 2D plot
 ggplot(fs, aes(x = `<Nd145Di>`, y = `<In115Di>`)) + facet_wrap(~name) + geom_hex(bins = 64)
 
 # changes to the gatingSet are only in memory, so you need to explicitly save changes
-# NOTE: you will not a warning when overwrite=TRUE, so be careful !!!
+# NOTE: you will not get a warning when overwrite=TRUE, so be careful !!!
 save_gs(gs, "output/gs_auto", overwrite=TRUE)
 
 # once we have the flow data properly processed and gated in a gatingSet
-# sometimes we would like to run COMPASS (Lin et al, Nature Biotech 2015)
+# sometimes we need the single-cell expression data for various purposes
+# eg: we would like to run COMPASS (Lin et al, Nature Biotech 2015)
 # to identify polyfunctional cell subsets in ICS experiments
-# flowWorkspace helps with this by providing getSingleCellExpression():
+# alternatively we can also perform dimension-reduction using Rtsne
+
+# flowWorkspace provides getSingleCellExpression():
 
 # nodes in the gatingSet from which the single-cell data will be extracted
 nodes <- c("CD8+IL2+"
