@@ -40,8 +40,6 @@ markers <- pData(parameters(fs[[1]]))
 markers <- markers[,c(1:2)]
 markers <- data.table(markers)
 
-
-
 # make list of channels that need to be transformed
 chnls <- as.vector(markers$name)
 names(chnls) <- markers$desc
@@ -49,7 +47,7 @@ names(chnls) <- markers$desc
 # for non-cyTOF data you would also need to compensate here...
 # flowCore provides compensate() function, ?flowCore::compensate for more details
 
-# estimate parameters of the logicle transformation from the data,
+# estimate parameters of logicle transformation (originated by flowJo) from the data,
 # then transform flowSet 
 fs_trans <- fs[seq(along=fs)]
 fr1 <- fs[["sample1.fcs"]]
@@ -57,13 +55,13 @@ tlist <- estimateLogicle(fr1, channels = chnls, type = "data")
 fs_trans <- transform(fs_trans, tlist)
 
 # ... alternatively, since CyTOF data shouldn't have zeros, 
-# you can use flowCore:::arcsinhTransform() eg.
+# you can use flowCore:::arcsinhTransform() ie.
 # x <- asinh(a+b*x) + c, a = shift, b = cofactor
 asinTrans <- arcsinhTransform("cytof_asinh", a=0, b=0.2)
 tlist_asinh <- transformList(chnls, asinTrans)
 fs_trans <- transform(fs_trans, tlist_asinh)
 
-# # compare before-vs-after transformation, "after" version should be more spread out 
+# compare before-vs-after transformation, "after" should be more spread out 
 p0 <- densityplot(~Rh103Di, fs[1], main="CD3 marker, raw data", margin=T)
 p1 <- densityplot(~Rh103Di, fs_trans[1], main="transformed", margin=T)
 grid.arrange(p0,p1, nrows=2)
@@ -96,6 +94,7 @@ pd$antigen[grep("GAG|Gag|gag", pd$name )] <- "GAG"
 pd$antigen[grep("SEB|Seb|seb", pd$name )] <- "SEB"
 pd$antigen[grep("neg|unstim|NA|na", pd$name )] <- "unstim"
 
+# `pd` here is just a data.frame, so all applicable operations are available
 pd <- merge(pd, meta[,.(ptid,controller_status,neut_status)], by="ptid")
 
 # write the metadata to the gatingSet
@@ -108,7 +107,7 @@ markernames(gs)
 # if this is empty or doesn't contain expected markers, you have a problem
 # double-check against the pData() result above, all the <desc> fields should be non-empty
 # eg. <CD4>, ,<Perforin>, <IFNg>, and *NOT* <NA>
-# to fix this, create a named vector of fluorophores and markers
+# to fix this, create a named vector of fluorophores and respective markers
 chnls <- c("<APC-Cy7-A>"
            ,"<PerCP-Cy5-5-A>"
            ,"<PE-Cy7-A>"
@@ -203,19 +202,22 @@ hist(x)
 flowWorkspace.par.set("plotGate", list("default.y" = "Rh103Di"))
 flowWorkspace.par.set("plotGate", list("type" = "histogram"))
 
-# example of removing a gate. Afterwards when we run gating() again, first gate to be gated will be CD3
-# removing a gate will also remove all downstream gates
+# removing a gate, which also removes all downstream gates
+# Afterwards when we run gating() again, first gate to be gated will be CD3
 Rm("CD4+", gs)
 
-# some basic plotting,  plotGate() uses R lattice graphics 
+# some basic plotting,  plotGate() uses R lattice graphics, has lots of options 
 # more details and examples at:
 # http://www.bioconductor.org/packages/release/bioc/vignettes/flowWorkspace/inst/doc/plotGate.html
 plotGate(gs, "CD3", type="densityplot")
-plotGate(gs[["first_fcs_file.fcs"]], "CD3", main="example of one sample's 2D gate")
-useOuterStrips(plotGate(gs, "live", type="densityplot",  cond="stim+ptid", main="density plot faceted by stimulation and patientID from pData"))
+plotGate(gs[["first_fcs_file.fcs"]], "CD3", main="dotplot of one sample's 2D gate")
+useOuterStrips(plotGate(gs, "live"
+                      , type="densityplot"
+                      , cond="stim+ptid"
+                      , main="density plot faceted by stimulation and patientID from pData"))
 
 # you can also exclude samples from the gatingSet by subsetting
-# this removes all unstimulated (control) samples, as determined by the gatingSet's phenoData
+# below removes all unstimulated (control) samples specified in gatingSet's phenoData
 # one more reason to fill out your pData(gs) correctly !!!
 gs <- subset(gs, !stim %in% c("unstim") )
 
