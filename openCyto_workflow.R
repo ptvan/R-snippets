@@ -40,6 +40,8 @@ markers <- pData(parameters(fs[[1]]))
 markers <- markers[,c(1:2)]
 markers <- data.table(markers)
 
+
+
 # make list of channels that need to be transformed
 chnls <- as.vector(markers$name)
 names(chnls) <- markers$desc
@@ -99,6 +101,35 @@ pd <- merge(pd, meta[,.(ptid,controller_status,neut_status)], by="ptid")
 # write the metadata to the gatingSet
 pData(gs) <- pd
 
+# handle missing markers: most tersely, 
+# and complimentary to the `markers <- pData(parameters(fs[[1]])) call above:
+markernames(gs)
+
+# if this is empty or doesn't contain expected markers, you have a problem
+# double-check against the pData() result above, all the <desc> fields should be non-empty
+# eg. <CD4>, ,<Perforin>, <IFNg>, and *NOT* <NA>
+# to fix this, create a named vector of fluorophores and markers
+chnls <- c("<APC-Cy7-A>"
+           ,"<PerCP-Cy5-5-A>"
+           ,"<PE-Cy7-A>"
+           ,"<PE-A>"
+           ,"<APC-Cy5-5-A>"
+           ,"<FITC-A>"
+)
+
+mkrs <- c("CD3"       
+          ,"CD8"       
+          ,"IFNg"      
+          ,"IL2"       
+          ,"GranzymeB" 
+          ,"Perforin" 
+)
+
+names(mkrs) <- chnls
+
+# ... then assign it to the gatingSet.
+markernames(gs) <- mkrs
+
 # save the gatingSet, breathe sigh of relief that you have survived this far
 # note that at this point you have created a gatingSet, but since 
 # you have not gated your data, this gatingSet is empty
@@ -135,7 +166,7 @@ ws <- openWorkspace("my_flowJo_workspace.xml")
 # `name` specifies which FlowJo samples to process
 gs <- parseWorkspace(ws , execute=F, name=3)
 
-# more options
+# more options for parseWorkspace()
 # `extend_val` captures negative gate coordinates that sometimes occur when
 # users gated samples by hand
 # `leaf.bool` specifies whether Boolean leaf nodes should be imported
