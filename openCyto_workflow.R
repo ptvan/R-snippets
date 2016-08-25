@@ -108,6 +108,7 @@ markernames(gs)
 # double-check against the pData() result above, all the <desc> fields should be non-empty
 # eg. <CD4>, ,<Perforin>, <IFNg>, and *NOT* <NA>
 # to fix this, create a named vector of fluorophores and respective markers
+# note the <> in channel names as per convention
 chnls <- c("<APC-Cy7-A>"
            ,"<PerCP-Cy5-5-A>"
            ,"<PE-Cy7-A>"
@@ -263,6 +264,8 @@ save_gs(gs, "output/gs_auto", overwrite=TRUE)
 # flowWorkspace provides getSingleCellExpression():
 
 # nodes in the gatingSet from which the single-cell data will be extracted
+# needs to specify full path if gating hierarchy is complicated 
+# with duplicate node names
 nodes <- c("CD8+IL2+"
            ,"CD8+Perforin+"
            ,"CD8+GranzymeB+"
