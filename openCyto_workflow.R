@@ -138,8 +138,12 @@ gs <- parseWorkspace(ws , execute=F, name=3)
 # more options
 # `extend_val` captures negative gate coordinates that sometimes occur when
 # users gated samples by hand
+# `leaf.bool` specifies whether Boolean leaf nodes should be imported
+# often for ICS data with many markers these nodes are quite extensive and 
+# suck up time and computing resources, and will be reconstructed on-the-fly 
+# later anyway
 gs <- parseWorkspace(ws, extend_val=-100)
-
+gs <- parseWorkspace(ws, leaf.bool=FALSE)
 
 # plots the gating hierarchy, which now shouldn't be empty
 plot(gs)
