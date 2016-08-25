@@ -179,6 +179,7 @@ gs <- parseWorkspace(ws, leaf.bool=FALSE)
 plot(gs)
 plot(gs, fontsize=16) #useful with too many nodes and names are too small to read
 
+# many analyses operate on cell proportions (eg. # CD8+IFNg+ cells / total CD8 cells)
 # get some population statistics
 getPopStats(gs)
 getPopStats(gs, sub="CD4+")
@@ -252,3 +253,36 @@ ggplot(fs, aes(x = `<Nd145Di>`, y = `<In115Di>`)) + facet_wrap(~name) + geom_hex
 # changes to the gatingSet are only in memory, so you need to explicitly save changes
 # NOTE: you will not a warning when overwrite=TRUE, so be careful !!!
 save_gs(gs, "output/gs_auto", overwrite=TRUE)
+
+# once we have the flow data properly processed and gated in a gatingSet
+# sometimes we would like to run COMPASS (Lin et al, Nature Biotech 2015)
+# to identify polyfunctional cell subsets in ICS experiments
+# flowWorkspace helps with this by providing getSingleCellExpression():
+
+# nodes in the gatingSet from which the single-cell data will be extracted
+nodes <- c("CD8+IL2+"
+           ,"CD8+Perforin+"
+           ,"CD8+GranzymeB+"
+           ,"CD8+IFNg+"
+)
+
+# mapping of the nodes to the markers
+map <- list("CD8+IL2+" = "IL2"  
+            , "CD8+Perforin+" = "Perforin"  
+            , "CD8+GranzymeB+" = "GranzymeB" 
+            , "CD8+IFNg+" = "IFNg" 
+)
+
+# getting the actual single-cell expression
+# `swap` specifies whether nodes and marker names should be swapped
+expr <-  getSingleCellExpression(gs
+                                 ,nodes = nodes
+                                 ,map = map                                    
+                                 ,swap = F
+)
+
+# save the data so you can create a COMPASSContainer with it later
+# (a bit outside the scope of openCyto, consult COMPASS documentation)
+saveRDS(expr, file="output/my_single_cell_expression.Rds")
+
+
