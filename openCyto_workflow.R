@@ -1,7 +1,6 @@
-# this example workflow reads in .fcs files, creates the associated flowCore-based structures
-# performs gating from scratch (ie. we were not provided gated data, normally flowJo workspaces)
-# the data used is CyTOF, so no compensation is needed, only transformation 
-# it also demonstrates some features of openCyto and the associated flow packages
+# this file illustrates some parts of a typical flow-cytometry workflow using 
+# openCyto and associated tools. It also shows some lesser-known tips and tricks
+# but is by no means comprehensive
 
 # Phu T. Van, Gottardo Lab, FHCRC, first created September 2015
 # edited and expanded sporadically since
@@ -211,11 +210,11 @@ Rm("CD4+", gs)
 # more details and examples at:
 # http://www.bioconductor.org/packages/release/bioc/vignettes/flowWorkspace/inst/doc/plotGate.html
 plotGate(gs, "CD3", type="densityplot")
-plotGate(gs[["first_fcs_file.fcs"]], "CD3", main="dotplot of one sample's 2D gate")
+plotGate(gs[["first_fcs_file.fcs"]], "CD3", main="dotplot of one sample's CD3 2D gate")
 useOuterStrips(plotGate(gs, "live"
                       , type="densityplot"
                       , cond="stim+ptid"
-                      , main="density plot faceted by stimulation and patientID from pData"))
+                      , main="density plot of `live` gate faceted by stimulation and patientID from pData"))
 
 # you can also exclude samples from the gatingSet by subsetting
 # below removes all unstimulated (control) samples specified in gatingSet's phenoData
@@ -284,5 +283,3 @@ expr <-  getSingleCellExpression(gs
 # save the data so you can create a COMPASSContainer with it later
 # (a bit outside the scope of openCyto, consult COMPASS documentation)
 saveRDS(expr, file="output/my_single_cell_expression.Rds")
-
-
