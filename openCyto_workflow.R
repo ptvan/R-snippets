@@ -135,6 +135,11 @@ ws <- openWorkspace("my_flowJo_workspace.xml")
 # `name` specifies which FlowJo samples to process
 gs <- parseWorkspace(ws , execute=F, name=3)
 
+# more options
+# `extend_val` captures negative gate coordinates that sometimes occur when
+# users gated samples by hand
+gs <- parseWorkspace(ws, extend_val=-100)
+
 
 # plots the gating hierarchy, which now shouldn't be empty
 plot(gs)
