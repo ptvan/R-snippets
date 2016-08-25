@@ -45,7 +45,11 @@ chnls <- as.vector(markers$name)
 names(chnls) <- markers$desc
 
 # for non-cyTOF data you would also need to compensate here...
-# flowCore provides compensate() function, ?flowCore::compensate for more details
+comp <- spillover(fs[[1]])[["SPILL"]]
+chnls <- colnames(comp)
+comp <- compensation(comp)
+gs <- compensate(gs, comp)
+
 
 # estimate parameters of logicle transformation (originated by flowJo) from the data,
 # then transform flowSet 
@@ -68,6 +72,10 @@ grid.arrange(p0,p1, nrows=2)
 
 # transformation looks good, make an empty (no gates) gatingSet from our transformed data
 gs <- GatingSet(fs_trans)
+
+# the above illustrates how to transform a flowSet, but most of the time, you want to
+# perform the transformation directly on the gatingSet so the transformation gets saved
+gs <- transform(gs, asinTrans)
 
 # you should index explicitly by sample name when referring to flowSets and gatingSets
 # since numeric indices could change
