@@ -3,7 +3,7 @@
 # but is by no means comprehensive
 
 # Phu T. Van, Gottardo Lab, FHCRC, first created September 2015
-# edited and expanded sporadically since
+# edited and expanded sporadically since, usually when new features are added
 
 library(openCyto)
 library(data.table)
@@ -20,7 +20,8 @@ setwd(path)
 fcs_files <- list.files(path, recursive=TRUE, pattern="fcs")
 ptids <- list.files(dataPath)
 
-# read in Excel sheet containing metadata, here I used gdata:::read.xls()
+# read in Excel sheet containing metadata
+# here I used gdata:::read.xls() but many alternative functions exist
 # this example has clinical variables "controller_status", among others
 meta <- read.xls("clinical_data.xlsx")
 meta$controller_status <- gsub(" ", "", meta$controller_status)
