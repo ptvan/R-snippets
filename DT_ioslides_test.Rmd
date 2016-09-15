@@ -1,0 +1,49 @@
+---
+title: "Sensible ioslides settings"
+author: "Phu T. Van"
+date: "September 9, 2016"
+output: 
+  ioslides_presentation:
+    smaller: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r libs, message = FALSE}
+library(ggplot2)
+library(data.table)
+library(DT)
+```
+
+## Display giant tables sensibly 
+use global option `"smaller: true"` and `"pageLength=X"` in `datatable()`
+
+```{r bigiris, echo=TRUE}
+datatable(
+  iris
+  ,class ='compact'
+  ,extensions = 'FixedColumns'
+  ,options = list(
+    dom = 'tp'
+    ,pageLength=7
+   )
+)
+
+```
+
+## Enable filtering & tweak appearance
+add `f` to `"dom = "`, change `class` to `stripe`
+```{r bigiris2, echo=TRUE}
+datatable(
+  iris
+  ,class ='stripe'
+  ,extensions = 'FixedColumns'
+  ,options = list(
+    dom = 'tpf'
+    ,pageLength=4
+    )
+)
+
+```
