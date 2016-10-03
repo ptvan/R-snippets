@@ -1,8 +1,30 @@
-extract_citrus_clusters <- function(RDSfile, anno, cluster_id=NULL) {
+extract_citrus_clusters <- function(RDSfile, anno, cluster_id=NULL, markers=markers) {
+  # There are two ways to use this function:
+  # 1. to extract *all* CV.min clusters from the RDSfile, leave cluster_id=NULL
+  # mat_of_cvmin_clusters <- extract_citrus_clusters(""citrusOutput_10000cells/Age.rds", anno, markers)
+  # 2. to extract a particular cluster from the RDSfile, specify its cluster_id
+  # mat_of_cluster12345 <- extract_citrus_clusters(""citrusOutput_10000cells/Age.rds", anno, cluster_id=12345, markers)
+  
+  # parameters:
+  # RDSfile: path to the Citrus .rds file that contains the Citrus run (eg. "/path/to/Age.rds")
+  # anno: data.frame containing annotation. anno <- read.csv("annotation.txt") in directory of each Citrus run
+  # cluster_id: numeric id of the cluster to extract , if NULL then extract all cv.min clusters found in RDS
+  # markers: named list translating markers <-> channels (for convenience I have saved this in an RDS)
+  #     markers <- readRDS("~/Dropbox (Gottardo Lab)/GoTeam/Projects/CART_X50/For Greg/markers.rds")
+ 
+  # return value:
+  # a named list of expression matrices (list has length 1 if you specified a single cluster, option 2 above)
   
   require(tools)
+
   short_name <- basename(file_path_sans_ext(RDSfile)) 
   rds <- readRDS(RDSfile)
+  members <- rds$citrus.foldClustering$allClustering$clusterMembership
+  chnls <- rds$citrus.foldClustering$allClustering$clusteringColumns
+  pd <- as.data.frame(cbind(rds$citrus.combinedFCSSet$fileNames, rds$citrus.combinedFCSSet$fileIds))
+  colnames(pd) <- c("FCS_File","fileId")
+  pd <- merge(pd, anno, by="FCS_File")
+  
   if (is.null(cluster_id)) {
   # no cluster_id supplied, get the glmnet cv.min clusters from the RDS  
     if ( class(rds$conditionRegressionResults[[short_name]]$glmnet$differentialFeatures$cv.min) == "character") { #only 1 cluster ?!
@@ -11,13 +33,14 @@ extract_citrus_clusters <- function(RDSfile, anno, cluster_id=NULL) {
       clusters <- rds$conditionRegressionResults[[short_name]]$glmnet$differentialFeatures$cv.min$clusters
     }
     expr <- as.data.frame(rds$citrus.combinedFCSSet$data)
-    cat("supplied Citrus RDS file contains", length(clusters), "clusters significant via glmnet:", cvmin_clusters )
+    cat("supplied Citrus RDS file contains", length(clusters), "glmnet cv.min clusters :", clusters )
     cat("\n extracting expression values...")
     events <- members[clusters]
     names(events) <- clusters
     
   } else {
-  # cluster_id supplied, just extract what the user asked for
+  # cluster_id supplied, just extract expression of specified cluster
+    expr <- as.data.frame(rds$citrus.combinedFCSSet$data)
     events <- members[cluster_id]
     names(events) <- cluster_id  
   }
@@ -31,7 +54,7 @@ extract_citrus_clusters <- function(RDSfile, anno, cluster_id=NULL) {
     x <- merge(x, pd, by="fileId")
     x <- x[,c(chnls, "ID")]
     
-    # use MFI instead of raw
+    # return MFI instead of raw
     x <- aggregate(.~ID, data=x, median, na.rm=TRUE)
     x <- merge(x, pd, by="ID")
     
