@@ -52,7 +52,7 @@ COMPASS_cell_proportions <- function(CR){
       for (j in 1:ncol(p)){ # NOTE: this assumes count_s & count_u have same dimensions
         coln <- colnames(p)[j]
         x <- unlist(strsplit(coln, "&"))
-        vec <- rep("+", length(antigens))
+        vec <- rep("+", length(cytokines))
         vec[grep("\\!", x)] = "-"
         vec <- c(ptid, time, vec, p[i,j] / totals[i], p_u[i,j] / totals_u[i], antigen)
         k <- k+1
@@ -122,7 +122,7 @@ COMPASS_cell_proportions_nonull <- function(CR){
       for (j in 1:ncol(p)){ # NOTE: this assumes count_s & count_u have same dimensions
         coln <- colnames(p)[j]
         x <- unlist(strsplit(coln, "&"))
-        vec <- rep("+", length(antigens))
+        vec <- rep("+", length(cytokines))
         vec[grep("\\!", x)] = "-"
         vec <- c(ptid, time, vec, p[i,j] / totals[i], p_u[i,j] / totals_u[i], antigen)
         k <- k+1
@@ -140,5 +140,74 @@ COMPASS_cell_proportions_nonull <- function(CR){
   big <- as.data.table(big)
   return(big)
     
+} 
+
+
+COMPASS_cell_counts_nonull <- function(CR){
+  
+  if(!is.list(CR) || class(CR[[1]]) != "COMPASSResult") {
+    stop("this function requires a list containing at least 1 COMPASSResult !!!")
+  }
+  
+  antigens <- names(CR)
+  
+  # create the big data.frame to be returned later
+  big <- data.frame(matrix(vector(),0, length(cytokines)+7))
+  colnames(big) <- c("ptid","time",cytokines, "degree" ,"poly", "unstim_count" ,"stim_count","antigen")
+  
+  # get cytokines (last column is "Counts", exclude it)
+  cytokines <- colnames(CR[[1]]$data$categories)
+  cytokines <- cytokines[-length(cytokines)]  
+ 
+  for (i in 1:length(antigens)){
+    antigen <- antigens[i]
+    cat(antigen, "\n")  
+    
+    # get cell counts, REMOVE NULL CATEGORY
+    p <- as.data.frame(CR[[antigen]]$data$n_s)
+    p <- p[,1:ncol(p)-1]
+    p_u <- as.data.frame(CR[[antigen]]$data$n_u)
+    p_u <- p_u[,1:ncol(p_u)-1]
+    
+    # RECALCULATE TOTAL
+    # totals <- apply(p, 1, sum)
+    # totals_u <- apply(p_u, 1, sum)
+    
+    p_new <- data.frame(matrix(vector(),0, length(cytokines)+7))
+    colnames(p_new) <- c("ptid","time",cytokines, "degree", "poly", "unstim_count", "stim_count","antigen")
+    k <- 0
+    
+    for (i in 1:nrow(p)){
+      rown <- rownames(p)[i]
+      # since this is time-series, need to split jointID into ptid and time
+      # eg. "1_0", ptid == 1, time == 0
+      
+      ptid <- unlist(strsplit(rown, "_"))[1]
+      time <- unlist(strsplit(rown, "_"))[2]
+      # calculate proportions, keeping the antigen combinations
+      for (j in 1:ncol(p)){ # NOTE: this assumes count_s & count_u have same dimensions
+        
+        coln <- colnames(p)[j]
+        x <- unlist(strsplit(coln, "&"))
+        vec <- rep("+", length(cytokines))
+        vec[grep("\\!", x)] = "-"
+        poly <- paste(cytokines[which(vec=="+")], collapse=" ")
+        degree <- length(which(vec=="+"))
+        vec <- c(ptid, time, vec, degree, poly, p[i,j], p_u[i,j], antigen)
+        k <- k+1
+        # cat("row", k, ":  ", vec, "\n")
+        p_new[k,] <- vec 
+      }
+    }
+    # append to big matrix
+    big <- rbind(big,p_new)
+  }
+  
+  big$time <- as.factor(big$time)
+  big$unstim_count <- as.numeric(big$unstim_count)
+  big$stim_count <- as.numeric(big$stim_count)
+  big <- as.data.table(big)
+  return(big)
+  
 } 
  

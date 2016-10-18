@@ -70,5 +70,3 @@ extract_citrus_clusters <- function(RDSfile, anno, cluster_id=NULL, markers=mark
   # `mat` is a list of matrices, named for the Citrus cluster IDs
   return(mat)
 }
-
-
