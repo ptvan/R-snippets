@@ -243,10 +243,11 @@ get1DGateCutpoints <- function(gs, gate){
   }
   return(clean)
 }
-
+# get the cutpoints
 cuts <- get1DGateCutpoints(gs, "CD8+")
+# here most other samples' cutpoint==0.1
 hist(as.numeric(cuts))
-bad_samples <- names(which(cuts < 0.1 ))
+bad_samples <- names(which(cuts < 0.1 )) 
 
 # you can also exclude samples from the gatingSet by subsetting
 # below removes all unstimulated (control) samples specified in gatingSet's phenoData
