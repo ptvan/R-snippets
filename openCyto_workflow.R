@@ -61,9 +61,11 @@ fs_trans <- transform(fs_trans, tlist)
 # ... alternatively, since CyTOF data shouldn't have zeros, 
 # you can use flowCore:::arcsinhTransform() ie.
 # x <- asinh(a+b*x) + c, a = shift, b = cofactor
-asinTrans <- arcsinhTransform("cytof_asinh", a=0, b=0.2)
-tlist_asinh <- transformList(chnls, asinTrans)
-fs_trans <- transform(fs_trans, tlist_asinh)
+chnls <- as.vector(markers$name)
+names(chnls) <- markers$desc
+asinTrans <-flowWorkspace::asinhtGml2_trans( T = 25000, M = 4, A = 0)
+tlist_asinh <- transformerList(chnls, asinTrans)
+
 
 # compare before-vs-after transformation, "after" should be more spread out 
 p0 <- densityplot(~Rh103Di, fs[1], main="CD3 marker, raw data", margin=T)
