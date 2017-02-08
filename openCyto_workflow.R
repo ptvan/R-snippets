@@ -228,6 +228,26 @@ useOuterStrips(plotGate(gs, "live"
                       , cond="stim+ptid"
                       , main="density plot of `live` gate faceted by stimulation and patientID from pData"))
 
+# in conjunction with plotting above, you can also look at the cutpoints 
+# for a 1D gate to identify potential outliers, eg.:
+
+get1DGateCutpoints <- function(gs, gate){
+  cuts <- lapply(gs, function(x)getGate(x,gate))
+  clean <- unlist(cuts)
+  for (i in 1:length(cuts)){
+    if(cuts[[i]]@min == Inf || cuts[[i]]@min ==-Inf){
+      clean[i] <- cuts[[i]]@max
+    } else {
+      clean[i] <- cuts[[i]]@min
+    }
+  }
+  return(clean)
+}
+
+cuts <- get1DGateCutpoints(gs, "CD8+")
+hist(as.numeric(cuts))
+bad_samples <- names(which(cuts < 0.1 ))
+
 # you can also exclude samples from the gatingSet by subsetting
 # below removes all unstimulated (control) samples specified in gatingSet's phenoData
 # one more reason to fill out your pData(gs) correctly !!!
