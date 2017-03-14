@@ -162,6 +162,27 @@ gating(gt, gs
        #, start ="dna"
 )
 
+#### exploring a difficult-to-gate sample using flowClust
+#### 
+library(flowClust)
+
+# extract the flowSet from the gatingSet, then get one flowFrame
+fs <- as.flowSet(getData(gs["TC022_UNS.fcs"], "cd8"))
+fr <- fs[[1]]
+chnl <- c("Tb159Di","Sm149Di")
+
+# run flowClust on the problematic sample, try up to 5 clusters
+g <- flowClust(fr, varNames = chnl, K=c(1:5), usePrior = "no", lambda=1,trans=0,nu=Inf)
+
+# plot the results, 2 of the clusters should give good data separation
+plot(g, data=fr)
+
+# extract the prior, print out the data structure
+# which we can then put into the gating template
+prior <- flowClust2Prior(g[[5]],kappa = 0.5)
+dump("prior",file="")
+
+
 ## ALTERNATIVELY, you can read in a gating hierarchy from GatingML (eg. from Cytobank)
 library(CytoML)
 xmlfile <- system.file("my_Cytobank_GatingML_file.xml")
