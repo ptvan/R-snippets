@@ -193,8 +193,8 @@ gating(gt, gs
 library(flowClust)
 
 # extract the flowSet from the gatingSet, then get one flowFrame
-fs <- as.flowSet(getData(gs["TC022_UNS.fcs"], "cd8"))
-fr <- fs[[1]]
+fs <- as.flowSet(getData(gs, "cd8"))
+fr <- fs[["TC022_UNS.fcs"]]
 chnl <- c("Tb159Di","Sm149Di")
 
 # run flowClust on the problematic sample, try up to 5 clusters
