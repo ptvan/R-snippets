@@ -152,6 +152,31 @@ gs <- load_gs("output/gs_auto/")
 gtFile <- "cyTOF_gt.csv"
 gt <- gatingTemplate(gtFile)
 
+# OPTIONALLY, and a bit more advanced
+# you can define custom preprocessing or gating functions
+# which can then be registered with openCyto
+
+# custom preprocessing function, this creates a static (not data-driven)
+# 1D gate over the `Tb159Di` dimension, gating out the negative population
+# its children will have only Tb159Di+ cells
+staticGate <- function(fs, gs, gm, channels, groupBy, isCollapse, ...){
+  g <- rectangleGate(filterId="cd164exclude", Tb159Di=c(0.15,Inf))  
+  sapply(sampleNames(fs), function(sn)g)
+}
+
+# this function simply returns the results in an openCyto-compatible way
+ppGate <- function(fr, pp_res, channels, ...){
+  pp_res  
+}
+
+registerPlugins(ppGate, "ppGate")
+registerPlugins(staticGate, "staticGate", type = "preprocessing")
+
+# the gating template has to be changed accordingly to refer to these functions
+# eg. this line:
+# cd164exclude,cd164exclude,cd8,Tb159Di,ppGate,,,,staticGate,
+
+
 # perform gating using the template. Could take a while if you have a lot of data
 # so definitely do this on a cluster or big multi-core machine if you can
 # Notice we can also optionally gate from a particular gate in the hierarchy
@@ -161,6 +186,7 @@ gating(gt, gs
        , parallel_type = "multicore"
        #, start ="dna"
 )
+
 
 #### exploring a difficult-to-gate sample using flowClust
 #### 
@@ -172,13 +198,14 @@ fr <- fs[[1]]
 chnl <- c("Tb159Di","Sm149Di")
 
 # run flowClust on the problematic sample, try up to 5 clusters
-g <- flowClust(fr, varNames = chnl, K=c(1:5), usePrior = "no", lambda=1,trans=0,nu=Inf)
+cl <- flowClust(fr, varNames = chnl, K=c(1:5), usePrior = "no", lambda=1,trans=0,nu=Inf)
 
 # plot the results, 2 of the clusters should give good data separation
-plot(g, data=fr)
+plot(cl, data=fr)
 
 # extract the prior, print out the data structure
 # which we can then put into the gating template
+# kappa < 1 means the clustering will be more data-driven
 prior <- flowClust2Prior(g[[5]],kappa = 0.5)
 dump("prior",file="")
 
