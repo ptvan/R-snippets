@@ -40,6 +40,4 @@ v <- voom(exprs(dat), design=mmatrix, plot=FALSE, lib.size=libNorm)
 ranCor <- duplicateCorrelation(v, design=mmatrix, block=anno$subject)$consensus.correlation
 
 # fit different models
-fit1 <- lmFit(v, mmatrix, block=phenoU$SID, correlation=ranCor)
-fit2 <- contrasts.fit(fit1, aovCon)
-fit2 <- eBayes(fit2, trend=FALSE)
+fit1 <- lmFit(v, mmatrix, block=anno$subject, correlation=ranCor)
