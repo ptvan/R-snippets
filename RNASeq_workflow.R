@@ -39,5 +39,17 @@ libNorm <- colSums(exprs(dat))*normy
 v <- voom(exprs(dat), design=mmatrix, plot=FALSE, lib.size=libNorm)
 ranCor <- duplicateCorrelation(v, design=mmatrix, block=anno$subject)$consensus.correlation
 
+# make the contrasts matrix
+aovCon <- makeContrasts(status=(negTST - posTST),
+                        levels=mmatrix)
+
 # fit different models
 fit1 <- lmFit(v, mmatrix, block=anno$subject, correlation=ranCor)
+fit2 <- contrasts.fit(fit1, aovCon)
+fit2 <- eBayes(fit2, trend=FALSE)
+
+# generate the table of top genes from the linear model fit
+allOut <- list()
+for(i in 1:ncol(aovCon)) {
+  allOut[[i]] <- topTable(fit2, number=nrow(v), coef=i, sort="P")
+}
