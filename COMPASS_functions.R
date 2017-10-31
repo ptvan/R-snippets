@@ -86,13 +86,13 @@ COMPASS_cell_proportions_nonull <- function(CR){
   
   antigens <- names(CR)
   
-  # create the big data.frame to be returned later
-  big <- data.frame(matrix(vector(),0, length(cytokines)+6))
-  colnames(big) <- c("ptid","time",cytokines,"unstim_proportion" ,"stim_proportion","antigen")
-  
   # get cytokines (last column is "Counts", exclude it)
   cytokines <- colnames(CR[[1]]$data$categories)
   cytokines <- cytokines[-length(cytokines)]  
+  
+  # create the big data.frame to be returned later
+  big <- data.frame(matrix(vector(),0, length(cytokines)+6))
+  colnames(big) <- c("ptid","time",cytokines,"unstim_proportion" ,"stim_proportion","antigen")
   
   for (i in 1:length(antigens)){
     antigen <- antigens[i]
