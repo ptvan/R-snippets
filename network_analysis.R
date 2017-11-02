@@ -14,6 +14,7 @@ make_gsea_igraph <- function(expressionList, cameraMat, geneSets, verbose=FALSE)
   # plot(n, edge.width=E(n)$overlap*.1, vertex.color="white", vertex.label.cex=0.5)
   
   require(igraph)
+  require(stringr)
   
   # get the geneset categories, and the expressed genes
   geneSetCats <- rownames(cameraMat)
