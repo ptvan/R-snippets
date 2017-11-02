@@ -24,11 +24,11 @@ make_gsea_igraph <- function(expressionList, cameraMat, geneSets, verbose=FALSE)
   
   # add vertex attributes
   V(net)$label <- geneSetCats
-  V(net)$totalGeneCount <- unlist(lapply(geneSets[rownames(res)], length))
-  V(net)$sigGeneCount <- res$NGenes
-  V(net)$direction <- res$Direction
-  V(net)$FDR <- res$FDR
-  V(net)$pval <- res$PValue
+  V(net)$totalGeneCount <- unlist(lapply(geneSets[rownames(cameraMat)], length))
+  V(net)$sigGeneCount <- cameraMat$NGenes
+  V(net)$direction <- cameraMat$Direction
+  V(net)$FDR <- cameraMat$FDR
+  V(net)$pval <- cameraMat$PValue
   
   # create list of edges
   tmp <- list()
