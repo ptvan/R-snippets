@@ -48,10 +48,10 @@ make_gsea_igraph <- function(expressionList, cameraMat, geneSets, verbose=FALSE)
   edges <- edges[lapply(edges, length)>0]
   
   # add edges from edge list to  graph
-  for (i in 1:length(out)){
-    nodes <- unlist(str_split(names(out)[i],"xxx"))
+  for (i in 1:length(edges)){
+    nodes <- unlist(str_split(names(edges)[i],"xxx"))
     net <- add_edges(net, c(which(nodes[1] == V(net)$label), which(nodes[2] == V(net)$label))) 
-    net <- set_edge_attr(net, "overlap", index=i, value=length(out[[i]]))
+    net <- set_edge_attr(net, "overlap", index=i, value=length(edges[[i]]))
   }
   
   return(net)
