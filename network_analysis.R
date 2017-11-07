@@ -60,8 +60,9 @@ make_gsea_overlap_igraph <- function(expressionList, cameraMat, geneSets, verbos
 make_STRING_igraph <- function(inputMatrix, STRINGdbObj){
   # Phu T. Van, FHCRC 2017, w/ substantial help and input from C.Murie & V.Voillet
   
-  # this function takes an input matrix that has one column named "gene" containing genes of interest and a stringDB 
-  # it returns an igraph graph of the STRING network containing those genes, with both STRING id's and gene names
+  # this function takes an input matrix having one column named "gene" containing genes of interest and a stringDB object
+  # it returns an igraph graph of the STRING network containing those genes
+  # the node attributes are "name" (STRING id) and "geneName" (original gene names from input matrix)
   # genes that do not have STRING annotation are omitted
   
   # example usage : 
