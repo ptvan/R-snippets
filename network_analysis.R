@@ -75,11 +75,17 @@ make_STRING_igraph <- function(inputMatrix, STRINGdbObj){
   require(STRINGdb)
   require(igraph)
   
+  # get gene names <-> STRING_id mapping
   smap <- STRINGdbObj$map(inputMatrix, "gene", removeUnmappedRows = TRUE )
-  stringNet <- STRINGdbObj$get_graph()
-  smap <- subset(smap, STRING_id%in%V(stringNet)$name)
   
+  # get network of all STRING edges (HUGE!!!)
+  stringNet <- STRINGdbObj$get_graph()
+  
+  # trim the network down to just our genes and potential edges
+  smap <- subset(smap, STRING_id%in%V(stringNet)$name)
   g <- induced_subgraph(stringNet, v=smap$STRING_id)
+  
+  # add the gene names to the vertexes since STRING ids are non-informative
   V(g)$geneName <- smap[match(get.vertex.attribute(g, "name"), smap$STRING_id),]$gene
   
   return(g)
