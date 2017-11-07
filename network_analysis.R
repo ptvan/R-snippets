@@ -1,4 +1,4 @@
-make_gsea_igraph <- function(expressionList, cameraMat, geneSets, verbose=FALSE){
+make_gsea_overlap_igraph <- function(expressionList, cameraMat, geneSets, verbose=FALSE){
   # Phu T. Van, FHCRC 2017, w/ substantial help and input from C.Murie & V.Voillet
   
   # this function takes a bioConductor EList (eg. voom-transformed RNASeq counts),
@@ -56,3 +56,30 @@ make_gsea_igraph <- function(expressionList, cameraMat, geneSets, verbose=FALSE)
   
   return(net)
 }  
+
+make_STRING_igraph <- function(inputMatrix, STRINGdbObj){
+  # Phu T. Van, FHCRC 2017, w/ substantial help and input from C.Murie & V.Voillet
+  
+  # this function takes an input matrix that has one column named "gene" containing genes of interest and a stringDB 
+  # it returns an igraph graph of the STRING network containing those genes, with both STRING id's and gene names
+  # genes that do not have STRING annotation are omitted
+  
+  # example usage : 
+  # DEGout <- topTable(fitBayes, number=nrow(vDat), coef="pttype", sort="P")
+  # DEGout$gene <- rownames(DEGout)
+  # string_db <- STRINGdb$new(version="10", species=9606, score_threshold=0, input_directory="/STRINGdb/HomoSapiens/")
+  # n <- make_STRING_igraph(DEGout, string_db)
+  # plot(n, vertex.label=V(n)$geneName)
+  
+  require(STRINGdb)
+  require(igraph)
+  
+  smap <- STRINGdbObj$map(inputMatrix, "gene", removeUnmappedRows = TRUE )
+  stringNet <- STRINGdbObj$get_graph()
+  smap <- subset(smap, STRING_id%in%V(stringNet)$name)
+  
+  g <- induced_subgraph(stringNet, v=smap$STRING_id)
+  V(g)$geneName <- smap[match(get.vertex.attribute(g, "name"), smap$STRING_id),]$gene
+  
+  return(g)
+}
