@@ -86,7 +86,7 @@ make_STRING_igraph <- function(inputMatrix, STRINGdbObj){
   g <- induced_subgraph(stringNet, v=smap$STRING_id)
   
   # add the gene names to the vertexes since STRING ids are non-informative
-  V(g)$geneName <- smap[match(get.vertex.attribute(g, "name"), smap$STRING_id),]$gene
+  V(g)$geneName <- smap[match(vertex_attr(g, "name"), smap$STRING_id),]$gene
   
   return(g)
 }
