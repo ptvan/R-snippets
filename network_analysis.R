@@ -90,3 +90,14 @@ make_STRING_igraph <- function(inputMatrix, STRINGdbObj){
   
   return(g)
 }
+
+# Make igraph from adjacency matrix
+library(WGCNA)
+library(igraph)
+adjMat  <- adjacency( vDat$E[which(rownames(vDat$E)%in%geneList$gene),], power = 6 )
+g <- graph_from_adjacency_matrix(adjMat, mode=c("undirected"))
+
+library(PCIT)
+corMat <- cor(t(vDat$E[which(rownames(vDat$E)%in%geneList$gene),]))
+pcitMemoryRequirement(nrow(corMat), units="MB")
+pcit(corMat)
