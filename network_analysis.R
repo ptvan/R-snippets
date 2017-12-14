@@ -126,3 +126,31 @@ pcit(corMat)
 
 # filter unconnected vertices
 net <- induced_subgraph(net, v=which(igraph::degree(g=net, v=V(net))>1))
+
+# create a network by expanding some "seed" genes with their KEGG-annotated pathway co-members
+myGenes <- c("TLR1"
+               ,"TLR2"
+               ,"TLR4"
+               ,"TLR6"
+               ,"NOD2"
+)
+
+# hsa2path <- keggLink("hsa", "pathway")
+# path2hsa <- keggLink("pathway", "hsa")
+
+gn2entrez <- ldply(mget(myGenes, envir=org.Hs.egSYMBOL2EG, ifnotfound=NA), data.frame)
+colnames(gn2entrez) <- c("geneName", "entrezNum")
+gn2entrez <- gn2entrez[complete.cases(gn2entrez),]
+
+entrez2kegg <- ldply(mget(gn2entrez$entrezNum, envir=org.Hs.egPATH, ifnotfound=NA), data.frame)
+colnames(entrez2kegg) <- c("entrezNum", "keggPathway")
+myPathways <- paste0("hsa", as.character(unique(entrez2kegg$keggPathway)))
+
+keggMatches <- NULL
+
+for (i in 1:length(myPathways)){
+  s <- keggGet(myPathways[i])[[1]]$GENE
+  s <- s[grep(";", s)]
+  s <- gsub("; .+$", "\\1", s)
+  keggMatches <- c(keggMatches, s)
+}
