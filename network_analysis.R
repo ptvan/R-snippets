@@ -92,38 +92,37 @@ make_STRING_igraph <- function(inputMatrix, STRINGdbObj){
 }
 
 # Make igraph from adjacency matrix
-# library(WGCNA)
-# library(igraph)
-# 
-# adjMat  <- adjacency( t(vDat$E[which(rownames(vDat$E)%in%geneList$gene),]))
-# diag(adjMat) <- 0
-# g <- graph_from_adjacency_matrix(adjMat, weighted=T, mode=c("undirected"))
-# 
-# # see what the correlation looks like for our genes and filter
-# # hist(edge_attr(g, "weight"))
-# g2 <- subgraph.edges(g, E(g)[weight>0.1])
-# V(g2)$logFC <- geneList[match(vertex_attr(g2, "name"), geneList$gene),]$logFC
-# V(g2)$geneName <- V(g2)$name
-# 
-# 
-# # plotting 
-# pu <- colorRampPalette(c("purple","mediumorchid","purple4"))(20)                      
-# ye <- colorRampPalette(c("lemonchiffon", "khaki","yellow"))(20)
-# 
-# ggplot(ggnetwork(g2, layout="fruchtermanreingold"), aes(x=x,y=y,xend=xend,yend=yend)) +
-#   geom_edges(aes(size = weight), color = "grey80") +
-#   geom_nodes(aes(color=logFC), size = 10) +
-#   scale_color_gradientn(colours=c(pu,"black", ye), na.value = "grey98", limits = c(-3, 3)) +
-#   geom_nodetext(aes(label=geneName)) +
-#   labs(title="WGCNA network of DEGs (pttype x stim), adjacency > 0.1") +
-#   theme_blank()
-# 
+library(WGCNA)
+library(igraph)
+
+adjMat  <- adjacency( t(vDat$E[which(rownames(vDat$E)%in%geneList$gene),]))
+diag(adjMat) <- 0
+g <- graph_from_adjacency_matrix(adjMat, weighted=T, mode=c("undirected"))
+
+# see what the correlation looks like for our genes and filter
+# hist(edge_attr(g, "weight"))
+
+g2 <- subgraph.edges(g, E(g)[weight>0.1])
+V(g2)$logFC <- geneList[match(vertex_attr(g2, "name"), geneList$gene),]$logFC
+V(g2)$geneName <- V(g2)$name
+
+
+# plotting 
+pu <- colorRampPalette(c("purple","mediumorchid","purple4"))(20)
+ye <- colorRampPalette(c("lemonchiffon", "khaki","yellow"))(20)
+
+ggplot(ggnetwork(g2, layout="fruchtermanreingold"), aes(x=x,y=y,xend=xend,yend=yend)) +
+  geom_edges(aes(size = weight), color = "grey80") +
+  geom_nodes(aes(color=logFC), size = 10) +
+  scale_color_gradientn(colours=c(pu,"black", ye), na.value = "grey98", limits = c(-3, 3)) +
+  geom_nodetext(aes(label=geneName)) +
+  labs(title="WGCNA network of DEGs (pttype x stim), adjacency > 0.1") +
+  theme_blank()
+
 # library(PCIT)
-# corMat <- cor(t(vDat$E[which(rownames(vDat$E)%in%geneList$gene),]))
-# pcitMemoryRequirement(nrow(corMat), units="MB")
-# pcit(corMat)
+corMat <- cor(t(vDat$E[which(rownames(vDat$E)%in%geneList$gene),]))
+pcitMemoryRequirement(nrow(corMat), units="MB")
+pcit(corMat)
 
 # filter unconnected vertices
-# net <- induced_subgraph(net, v=which(igraph::degree(g=net, v=V(net))>1))
-
-
+net <- induced_subgraph(net, v=which(igraph::degree(g=net, v=V(net))>1))
