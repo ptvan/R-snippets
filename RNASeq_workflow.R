@@ -12,6 +12,7 @@ library(plyr)
 library(stringr)  
 library(plotly)
 library(cowplot)
+library(biomaRt)
 
 workDir <- "~/RNASeq/data"
 setwd(workDir)
@@ -24,6 +25,7 @@ dat <- read.table("TBData.txt", sep="\t", header=T)
 dat <- ExpressionSet(assayData=as.matrix(dat))
 
 # clean and format annotation
+# here we have two contrasts: "TB vs. no TB" and "TSTneg vs. TSTpos"
 anno <- anno[,c(2,3,4,7,8)]
 colnames(anno) <- c("sample_name", "TB_status", "TST_status", "subject", "sample_type")
 anno$TB_status <- factor(anno$TB_status)
@@ -38,6 +40,27 @@ normy <- calcNormFactors(dat)
 libNorm <- colSums(exprs(dat))*normy
 v <- voom(exprs(dat), design=mmatrix, plot=FALSE, lib.size=libNorm)
 ranCor <- duplicateCorrelation(v, design=mmatrix, block=anno$subject)$consensus.correlation
+
+# look up gene symbols' chromosomal location on ENSEMBL
+ensemblMart <- useMart("ensembl")
+ensembl <- useDataset("hsapiens_gene_ensembl",mart=ensemblMart)
+chrom <- c(1:22,"X","Y")
+attrs <- c("hgnc_symbol", "external_gene_name", "chromosome_name")
+chrMap <- getBM(attributes=attrs
+                ,filters=c("chromosome_name")
+                ,values=list(chrom)
+                ,mart=ensembl)
+
+expressedGenes <- rownames(v$E)
+
+# get genes on Y chromosome, remove them from data matrix ...
+chrYgenes <- intersect(expressedGenes, subset(chrMap, chromosome_name=="Y")$external_gene_name)
+eDatnoY <- ExpressionSet(assayData=as.matrix(counts[!rownames(counts) %in% chrYgenes,]))
+
+# ... and see how the data separates without sex genes
+plotMDS(vDatnoY, col=rainbow(length(unique(colTB)))[as.numeric(colTB)],  main="TB status, chrY genes removed", pch=1)
+legend("bottomleft", c("noTB","TB"), pch=1, col=c("#FF0000FF", "#00FFFFFF"))
+
 
 # make the contrasts matrix
 aovCon <- makeContrasts(status=(negTST - posTST),
