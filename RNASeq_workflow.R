@@ -32,8 +32,11 @@ anno$TB_status <- factor(anno$TB_status)
 anno$TST_status <- factor(anno$TST_status)
 anno$sample_type <- factor(anno$sample_type)
 
-# create model matrix
+# create model matrix and corresponding labels for contrasts
 mmatrix <- model.matrix(~0+TST_status, data=anno)
+cons <- colnames(mmatrix)[-1] 
+labs <- c("pttype", "gender", "pttype*gender")
+
 
 # normalize using voom
 normy <- calcNormFactors(dat)
@@ -66,13 +69,44 @@ legend("bottomleft", c("noTB","TB"), pch=1, col=c("#FF0000FF", "#00FFFFFF"))
 aovCon <- makeContrasts(status=(negTST - posTST),
                         levels=mmatrix)
 
+### Differentially Expressed Genes (DEG) analysis
 # fit different models
 fit1 <- lmFit(v, mmatrix, block=anno$subject, correlation=ranCor)
 fit2 <- contrasts.fit(fit1, aovCon)
 fit2 <- eBayes(fit2, trend=FALSE)
 
-# generate the table of top genes from the linear model fit
+# generate the table of top DEGs from the linear model fit
 allOut <- list()
 for(i in 1:ncol(aovCon)) {
   allOut[[i]] <- topTable(fit2, number=nrow(v), coef=i, sort="P")
+}
+
+
+### Gene Set Enrichment Analysis (GSEA)
+# load GMT files (http://software.broadinstitute.org/gsea/msigdb/collections.jsp)
+# GMT files can be concatenated together
+FDRCut <- 0.2
+
+gmtFile <- "c2c7.concatenated.v6.0.symbols.gmt"
+minGeneSetCut <- 5
+
+geneSet <- getGmt(gmtFile)
+geneIds <- geneIds(geneSet)
+setsIndices <- ids2indices(geneIds, rownames(vDat$E))
+setsIndices <- setsIndices[sapply(setsIndices, length) > minGeneSetCut]
+
+combo <- comboTab <- list()
+comboGSEA <- list()
+for(i in 1:length(cons)) {
+  res <- camera(vDat, setsIndices, design=designMat, contrast=cons[i], sort=TRUE)
+  indo <- res$FDR <= FDRCut
+  if(sum(indo) > 0) {
+    combo[[labs[i]]] <- res[indo, c("Direction","PValue","FDR")]
+    comboTab[[labs[[i]]]] <- datatable(res[indo, c("Direction","PValue","FDR")], caption=labs[i]
+                                       , extensions = 'Buttons'
+                                       , options = list(dom = 'Bfrtip',
+                                                        buttons = c('csv', 'excel'))
+    )
+  }
+  comboGSEA[[i]] <- res
 }
