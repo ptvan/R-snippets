@@ -45,14 +45,23 @@ v <- voom(exprs(dat), design=mmatrix, plot=FALSE, lib.size=libNorm)
 ranCor <- duplicateCorrelation(v, design=mmatrix, block=anno$subject)$consensus.correlation
 
 # look up gene symbols' chromosomal location on ENSEMBL
-ensemblMart <- useMart("ensembl")
+# explicitly set which server we use, since mirrors can go down for maintenance
+
+ensemblMart <- useMart("ensembl"
+              ,host = "www.ensembl.org"
+              ,ensemblRedirect = FALSE)
 ensembl <- useDataset("hsapiens_gene_ensembl",mart=ensemblMart)
+
 chrom <- c(1:22,"X","Y")
 attrs <- c("hgnc_symbol", "external_gene_name", "chromosome_name")
+
+# NOTE: this query can be a bit slow, so likely we'll want to save results
+# rather than running it everytime
 chrMap <- getBM(attributes=attrs
                 ,filters=c("chromosome_name")
                 ,values=list(chrom)
                 ,mart=ensembl)
+
 
 expressedGenes <- rownames(v$E)
 
