@@ -53,7 +53,8 @@ ensemblMart <- useMart("ensembl"
 ensembl <- useDataset("hsapiens_gene_ensembl",mart=ensemblMart)
 
 chrom <- c(1:22,"X","Y")
-attrs <- c("hgnc_symbol", "external_gene_name", "chromosome_name")
+attrs <- c("hgnc_symbol", "external_gene_name", "chromosome_name", "gene_biotype")
+
 
 # NOTE: this query can be a bit slow, so likely we'll want to save results
 # rather than running it everytime
@@ -62,12 +63,15 @@ chrMap <- getBM(attributes=attrs
                 ,values=list(chrom)
                 ,mart=ensembl)
 
+# get only protein coding genes
+proteinCodingGenes <- subset(chrMap, gene_biotype=="protein_coding")$external_gene_name
 
 expressedGenes <- rownames(v$E)
 
 # get genes on Y chromosome, remove them from data matrix ...
 chrYgenes <- intersect(expressedGenes, subset(chrMap, chromosome_name=="Y")$external_gene_name)
 eDatnoY <- ExpressionSet(assayData=as.matrix(counts[!rownames(counts) %in% chrYgenes,]))
+
 
 # ... and see how the data separates without sex genes
 plotMDS(vDatnoY, col=rainbow(length(unique(colTB)))[as.numeric(colTB)],  main="TB status, chrY genes removed", pch=1)
