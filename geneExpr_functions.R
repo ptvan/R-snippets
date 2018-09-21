@@ -60,6 +60,8 @@ categoryCompare <- function(dat, setsIndices, categories, grp1name="group1", grp
   if (length(intersect(geneList, rownames(dat))) > 0){
     tab <- data.table(cbind(categories, rep(1, length(categories)), rep(0, length(categories))))
     setnames(tab, c("categories", "V2","V3"), c("category", "totalGenes", "genesUp"))
+    tab$totalGenes <- as.numeric(tab$totalGenes)
+    tab$genesUp <- as.numeric(tab$genesUp)
     
     for (i in 1:length(categories)){
       cat <- categories[i]
