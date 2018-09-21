@@ -1,2 +1,2 @@
 # R-snippets
-collected R code snippets over the years
+R code snippets collected over the years
