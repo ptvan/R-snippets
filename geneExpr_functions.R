@@ -87,7 +87,7 @@ categoryCompare <- function(dat, setsIndices, categories, grp1name="group1", grp
       
     }
     tab$proportionUp <- round(tab$genesUp / tab$totalGenes, 3)
-    setnames(tab, c("genesUp"), c(paste0("genesUpIn", group2)))
+    setnames(tab, c("genesUp"), c(paste0("genesUpIn", grp2name)))
     return(tab)
     
   } else { stop ("geneList does not match ANY columns in data !!!") }
