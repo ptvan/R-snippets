@@ -54,7 +54,23 @@ geneCompare <- function (dat, geneList, grp1name="group1", grp2name="group2", gr
 
 
 categoryCompare <- function(dat, setsIndices, categories, grp1name="group1", grp2name="group2", grp1idx, grp2idx){
+  # compares the mean expression between two groups of genes in a given 
+  # expression matrix, calculates the number and proportion of genes in the 
+  # input matrix that are up-regulated
   
+  # requires a setsindices, a nested-list of gene indices for each GSEA category
+  # setsindices are most commonly made from limma::ids2indices()
+  
+  # example: setsIndices <- ids2indices(geneIds, rownames(expressionMatrix))
+  # categories <- names(setsIndices)
+  # out <- categoryCompare(expressionMatrix,
+  #                                   setIndices,
+  #                                   categories,
+  #                                   grp1name = "control", 
+  #                                   grp2name = "experimental", 
+  #                                   which(grepl("control", colnames(expressionMatrix))), 
+  #                                   which(grepl("experimental", colnames(expressionMatrix)))  
+  #                                   )
   require(data.table)
   
   if (length(intersect(geneList, rownames(dat))) > 0){
