@@ -73,6 +73,9 @@ categoryCompare <- function(dat, setsIndices, grp1name="group1", grp2name="group
   require(data.table)
   
   if (!is.null(names(setsIndices))){
+    
+    categories <- names(setsIndices)
+    
     tab <- data.table(cbind(categories, rep(1, length(categories)), rep(0, length(categories))))
     setnames(tab, c("categories", "V2","V3"), c("category", "totalGenes", "genesUp"))
     tab$totalGenes <- as.numeric(tab$totalGenes)
