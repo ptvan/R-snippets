@@ -100,7 +100,7 @@ categoryCompare <- function(dat, setsIndices, grp1name="group1", grp2name="group
         row <- merge(subset(d, group==grp1name)[,list(group1expr=mean(expr)),by=geneName],
                      subset(d, group==grp2name)[,list(group2expr=mean(expr)),by=geneName],
                      by="geneName")
-        tab[tab$category==cat]$genesUp <- length(which(row$group2expr - row$group1expr < 0))
+        tab[tab$category==cat]$genesUp <- length(which(row$group2expr > row$group1expr))
       }
       
     }
