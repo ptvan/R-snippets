@@ -53,7 +53,7 @@ geneCompare <- function (dat, geneList, grp1name="group1", grp2name="group2", gr
 }
 
 
-categoryCompare <- function(dat, setsIndices, categories, grp1name="group1", grp2name="group2", grp1idx, grp2idx){
+categoryCompare <- function(dat, setsIndices, grp1name="group1", grp2name="group2", grp1idx, grp2idx){
   # compares the mean expression between two groups of genes in a given 
   # expression matrix, calculates the number and proportion of genes in the 
   # input matrix that are up-regulated
@@ -65,7 +65,6 @@ categoryCompare <- function(dat, setsIndices, categories, grp1name="group1", grp
   # categories <- names(setsIndices)
   # out <- categoryCompare(expressionMatrix,
   #                                   setIndices,
-  #                                   categories,
   #                                   grp1name = "control", 
   #                                   grp2name = "experimental", 
   #                                   which(grepl("control", colnames(expressionMatrix))), 
@@ -73,7 +72,7 @@ categoryCompare <- function(dat, setsIndices, categories, grp1name="group1", grp
   #                                   )
   require(data.table)
   
-  if (length(intersect(geneList, rownames(dat))) > 0){
+  if (!is.null(names(setsIndices))){
     tab <- data.table(cbind(categories, rep(1, length(categories)), rep(0, length(categories))))
     setnames(tab, c("categories", "V2","V3"), c("category", "totalGenes", "genesUp"))
     tab$totalGenes <- as.numeric(tab$totalGenes)
@@ -102,12 +101,10 @@ categoryCompare <- function(dat, setsIndices, categories, grp1name="group1", grp
       }
       
     }
+    
     tab$proportionUp <- round(tab$genesUp / tab$totalGenes, 3)
     setnames(tab, c("genesUp"), c(paste0("genesUpIn", grp2name)))
     return(tab)
-    
-  } else { stop ("geneList does not match ANY columns in data !!!") }
-    
-  
+  } else { "setsIndices must be a named list-of-lists !!!" }
   
 }
