@@ -3,11 +3,11 @@ geneCompare <- function (dat, geneList, grp1name="group1", grp2name="group2", gr
   # expression matrix, optionally makes boxplots of the comparison, faceted by gene
   # used in a pipeline, so checks are pretty rudimentary
   
-  # example: out <- summarizeGenelist(expressionMatrix,
-  #                                   c("LAP3","NCOA7","IFIT2","STAT1","TRIM21"), 
-  #                                   grp1name = "control", 
-  #                                   grp2name = "experimental", 
-  #                                   which(grepl("control", colnames(expressionMatrix))), 
+  # example: out <- geneCompare(expressionMatrix
+ #                                    ,c("LAP3","NCOA7","IFIT2","STAT1","TRIM21")
+  #                                   ,grp1name = "control"
+  #                                   ,grp2name = "experimental"
+  #                                   ,which(grepl("control", colnames(expressionMatrix))) 
   #                                   which(grepl("experimental", colnames(expressionMatrix)))  
   #                                   )
 
@@ -27,15 +27,19 @@ geneCompare <- function (dat, geneList, grp1name="group1", grp2name="group2", gr
         idxs[grp2idx] <- grp2name
         idx <- data.frame(cbind(cols,idxs))
         d <- data.table(merge(melt(dat), idx, by.x="Var2", by.y="cols"))
-        setnames(d, c("Var1","Var2","value", "idxs"), c("geneName", "inputColumn","expr","group"))
+        setnames(d, c("Var1","Var2","value", "idxs")
+                  , c("geneName", "inputColumn","expr","group"))
         
         tab <- merge(subset(d, group==grp1name)[,list(group1expr=mean(expr)),by=geneName],
                      subset(d, group==grp2name)[,list(group2expr=mean(expr)),by=geneName],
                      by="geneName")
-        setnames(tab, c("group1expr", "group2expr"), c(grp1name,grp2name))
-        tab$higher <- tab[,..grp2name] > tab[,..grp1name]
+        
+        tab$higher <- tab$group2 > tab$group1
         tab$higher <- gsub("FALSE", grp1name, tab$higher)
         tab$higher <- gsub("TRUE", grp2name, tab$higher)
+        
+        setnames(tab, c("group1expr", "group2expr")
+                    , c(grp1name,grp2name))
         
         if(plot) {
           ggplot(d, aes(x=group, y=expr, col=group)) +
@@ -77,7 +81,8 @@ categoryCompare <- function(dat, setsIndices, grp1name="group1", grp2name="group
     categories <- names(setsIndices)
     
     tab <- data.table(cbind(categories, rep(1, length(categories)), rep(0, length(categories))))
-    setnames(tab, c("categories", "V2","V3"), c("category", "totalGenes", "genesUp"))
+    setnames(tab, c("categories", "V2","V3")
+                , c("category", "totalGenes", "genesUp"))
     tab$totalGenes <- as.numeric(tab$totalGenes)
     tab$genesUp <- as.numeric(tab$genesUp)
     
@@ -95,7 +100,8 @@ categoryCompare <- function(dat, setsIndices, grp1name="group1", grp2name="group
         idxs[grp2idx] <- grp2name
         idx <- data.frame(cbind(cols,idxs))
         d <- data.table(merge(melt(d), idx, by.x="Var2", by.y="cols"))
-        setnames(d, c("Var1","Var2","value", "idxs"), c("geneName", "inputColumn","expr","group"))
+        setnames(d, c("Var1","Var2","value", "idxs")
+                  , c("geneName", "inputColumn","expr","group"))
         
         row <- merge(subset(d, group==grp1name)[,list(group1expr=mean(expr)),by=geneName],
                      subset(d, group==grp2name)[,list(group2expr=mean(expr)),by=geneName],
