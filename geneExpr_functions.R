@@ -34,7 +34,7 @@ geneCompare <- function (dat, geneList, grp1name="group1", grp2name="group2", gr
                      subset(d, group==grp2name)[,list(group2expr=mean(expr)),by=geneName],
                      by="geneName")
         
-        tab$higher <- tab$group2 > tab$group1
+        tab$higher <- tab$group2expr > tab$group1expr
         tab$higher <- gsub("FALSE", grp1name, tab$higher)
         tab$higher <- gsub("TRUE", grp2name, tab$higher)
         
