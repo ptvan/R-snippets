@@ -77,6 +77,41 @@ allGenes <- unique(hg38gtf@ev$gtf$gene_name)
 exon <- extractFeature(hg38gtf, "exon")
 exonicGenes <- unique(exon@ev$gtf$gene_name)
 
+# mapping mouse <-> human genes via ENSEMBL gene_id
+human <- useMart("ensembl", dataset = "hsapiens_gene_ensembl") 
+
+# extra orthology columns so we can filter the mouse genes if necessary
+attrs <- c("ensembl_gene_id"
+           ,"mmusculus_homolog_ensembl_gene"
+           ,"mmusculus_homolog_perc_id_r1"
+           ,"mmusculus_homolog_orthology_type"
+           ,"mmusculus_homolog_subtype"
+           ,"mmusculus_homolog_perc_id"
+           ,"mmusculus_homolog_associated_gene_name"
+) 
+
+mouse <- getBM( attrs
+                ,filters="with_mmusculus_homolog"
+                ,values =TRUE
+                , mart = human
+                , bmHeader=FALSE)
+
+# two separate getBM() calls since BioMart doesn't allow
+# gene- and transcript-level queries in the same call
+attrs2 <- c("ensembl_gene_id"
+            ,"hgnc_symbol"
+            ,"external_gene_name")
+
+E2GN <- getBM( attrs2
+               ,filters="with_mmusculus_homolog"
+               ,values =TRUE
+               , mart = human
+               , bmHeader=FALSE)
+
+map <- merge(mouse, E2GN, by="ensembl_gene_id")
+map$mmusculus_homolog_associated_gene_name <- toupper(map$mmusculus_homolog_associated_gene_name)
+map[c("hgnc_symbol","mmusculus_homolog_associated_gene_name")]
+
 
 # these are the genes actually in our data matrix
 expressedGenes <- rownames(v$E)
