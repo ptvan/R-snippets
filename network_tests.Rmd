@@ -1,0 +1,34 @@
+---
+title: "igraph experiments"
+author: "Phu T. Van"
+date: "October 3, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(igraph)
+library(visNetwork)
+
+
+```
+
+### Tooltips for network nodes using `igraph` and `visNetwork`
+
+```{r visNetwork ,echo=FALSE}
+set.seed(1)
+ba <-  sample_pa(n=100, power=1, m=1,  directed=F)
+V(ba)$color<-"yellow"
+V(ba)$label <- paste0("Node", 1:vcount(ba))
+V(ba)$label.cex <- rep(1.5, vcount(ba))
+ba <- toVisNetworkData(ba)
+
+# E(ba)$title <- paste0("Node", 1:ecount(ba))
+
+visNetwork(ba$nodes, ba$edges, main = "igraph object laid out with visNetwork") %>% 
+  visEdges(color = "black") %>% 
+  visIgraphLayout("layout.fruchterman.reingold") %>%
+  # visLegend(width = 0.1, position = "right", main = "Group") %>%
+  visOptions(width = "600", height = "600")
+```  
+  
