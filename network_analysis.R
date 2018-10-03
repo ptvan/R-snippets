@@ -1,6 +1,8 @@
 # Make igraph from adjacency matrix
 library(WGCNA)
 library(igraph)
+library(ggraph2)
+library(ggnetwork)
 
 adjMat  <- adjacency( t(vDat$E[which(rownames(vDat$E)%in%geneList$gene),]))
 diag(adjMat) <- 0
@@ -26,7 +28,8 @@ ggplot(ggnetwork(g2, layout="fruchtermanreingold"), aes(x=x,y=y,xend=xend,yend=y
   labs(title="WGCNA network of DEGs (pttype x stim), adjacency > 0.1") +
   theme_blank()
 
-# library(PCIT)
+# using Partial Correlation Coefficient with Information Theory (PCIT)
+library(PCIT)
 corMat <- cor(t(vDat$E[which(rownames(vDat$E)%in%geneList$gene),]))
 pcitMemoryRequirement(nrow(corMat), units="MB")
 pcit(corMat)
