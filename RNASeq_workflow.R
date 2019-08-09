@@ -13,6 +13,8 @@ library(stringr)
 library(plotly)
 library(cowplot)
 library(biomaRt)
+library(org.Hs.eg.db)
+library(topGO)
 
 workDir <- "~/RNASeq/data"
 setwd(workDir)
@@ -143,7 +145,7 @@ for(i in 1:ncol(aovCon)) {
 }
 
 
-### Gene Set Enrichment Analysis (GSEA)
+### Gene Set Enrichment Analysis (GSEA) using CAMERA
 # load GMT files (http://software.broadinstitute.org/gsea/msigdb/collections.jsp)
 # GMT files can be concatenated together
 FDRCut <- 0.2
@@ -171,3 +173,33 @@ for(i in 1:length(cons)) {
   }
   comboGSEA[[i]] <- res
 }
+
+### GeneOntology analysis using topGO
+# which in turn requires annotation from org.Hs.eg.db
+# read in a table of genes, logFC, AveExpr, t, P.Value, adj.P.Val and B 
+# from limma's topTable()
+favGenes <- readRDS("DEG_FDR020.Rds")
+
+# topGO expects an named vector of p.values, and a function to select top genes
+# to create a GOdata object
+GOinput <- favGenes$P.Value
+names(GOinput) <- rownames(favGenes)
+selection <- function(allScore){ return(allScore < 0.05)}
+allGO2genes <- annFUN.org(whichOnto="BP", feasibleGenes=NULL, mapping="org.Hs.eg.db", ID="symbol")
+
+GOdata <- new("topGOdata",
+              ontology="BP",
+              allGenes=GOinput,
+              annot=annFUN.GO2genes,
+              GO2genes=allGO2genes,
+              geneSel=selection,
+              nodeSize=10)
+
+# run test on on the GOdata object, tests are listed by topGO:whichTests()
+# which includes Fisher, Kolmogoov-Smirnov (KS) and others
+# these tests are for the GO enrichment, and *not* for differential expression 
+GOoutput <- runTest(GOdata
+                    , algorithm = "classic"
+                    , statistic = "ks")
+
+GOtable <- GenTable(GOdata, KS=GOoutput, orderBy="KS", topNodes=20)
