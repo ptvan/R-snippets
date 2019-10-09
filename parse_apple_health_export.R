@@ -39,5 +39,13 @@ running <- running %>%
 write.csv(running, "runningData.csv", row.names = FALSE, quote = FALSE)
 
 #### extract step counts
+steps <- subset(records, sourceName == "iPhu" & type == "HKQuantityTypeIdentifierStepCount") %>%
+  dplyr::select(creationDate, startDate, endDate, value) %>%
+  mutate(value = as.numeric(as.character(value))) %>%
+  rename(value = "stepsWalked")
+
+write.csv(steps, "stepsData.csv", row.names = FALSE, quote = FALSE)
+
+
 
   
