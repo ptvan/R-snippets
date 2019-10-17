@@ -52,4 +52,4 @@ ggplot(ggnetwork(g, layout="fruchtermanreingold"), aes(x=x,y=y,xend=xend,yend=ye
   geom_edges() +
   geom_nodes(aes(color=type),size = 10) +
   geom_nodetext(aes(label=display), size=2) +
-  theme_bw()
+  theme_blank()
