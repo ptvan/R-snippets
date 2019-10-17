@@ -51,5 +51,5 @@ plot(g, vertex.label=V(g)$display)
 ggplot(ggnetwork(g, layout="fruchtermanreingold"), aes(x=x,y=y,xend=xend,yend=yend)) +
   geom_edges() +
   geom_nodes(aes(color=type),size = 10) +
-  geom_nodetext(aes(label=display), size=2) +
+  geom_nodetext(aes(label=display), size=3) +
   theme_blank()
