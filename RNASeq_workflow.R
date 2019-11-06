@@ -34,6 +34,12 @@ anno$TB_status <- factor(anno$TB_status)
 anno$TST_status <- factor(anno$TST_status)
 anno$sample_type <- factor(anno$sample_type)
 
+# for coloring MDS plots
+colTB <- anno$TB_status
+
+# cut() will discretize and create factors for us
+colage <- cut(anno$age, breaks=c(0,10,30,60), laels=c("children","teens","middleage", "elderly"))
+
 # create model matrix and corresponding labels for contrasts
 mmatrix <- model.matrix(~0+TST_status, data=anno)
 cons <- colnames(mmatrix)[-1] 
@@ -124,8 +130,12 @@ eDatnoY <- ExpressionSet(assayData=as.matrix(counts[!rownames(counts) %in% chrYg
 
 
 # ... and see how the data separates without sex genes
+# plotMDS can either take a voom-transformed structure like `vDatnoY` below...
 plotMDS(vDatnoY, col=rainbow(length(unique(colTB)))[as.numeric(colTB)],  main="TB status, chrY genes removed", pch=1)
 legend("bottomleft", c("noTB","TB"), pch=1, col=c("#FF0000FF", "#00FFFFFF"))
+
+# ... or just a bare expression set, `eDatnoY`
+plotMDS(eDatnoY, col=rainbow(length(unique(colage)))[as.numeric(colage)])
 
 
 # make the contrasts matrix
