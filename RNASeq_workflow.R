@@ -16,35 +16,47 @@ library(biomaRt)
 library(org.Hs.eg.db)
 library(topGO)
 
-workDir <- "~/RNASeq/data"
-setwd(workDir)
+## generate dummy data:
 
-# read in counts and annotation CSV
-anno <- read.table("TB_Annotation.csv", sep=",", header = T)
-dat <- read.table("TBData.txt", sep="\t", header=T)
+# get a bunch of human gene names
+genes <- unlist(lookUp(as.character(1:50000), 'org.Hs.eg', 'SYMBOL')) 
+genes <- genes[!is.na(genes)]
+names(genes) <- NULL
+
+# generate some dummy subjects, p001 to p050
+ptids <- paste0("p",str_pad(as.character(1:50), 3, "left", "0"))
+
+# generate dummy RNASeq counts
+counts <- matrix(sample(1:1e6, length(genes)*length(ptids)), nrow=length(genes), ncol=length(ptids)*2)
+
+# each subject has "MEDIA" and "STIM" samples
+samples <- c(paste0(ptids,"_MEDIA"), paste0(ptids,"_STIM"))
+colnames(counts) <- samples
+rownames(counts) <- genes
 
 # create ExpressionSet
-dat <- ExpressionSet(assayData=as.matrix(dat))
+dat <- ExpressionSet(assayData=as.matrix(counts))
 
-# clean and format annotation
-# here we have two contrasts: "TB vs. no TB" and "TSTneg vs. TSTpos"
-anno <- anno[,c(2,3,4,7,8)]
-colnames(anno) <- c("sample_name", "TB_status", "TST_status", "subject", "sample_type")
-anno$TB_status <- factor(anno$TB_status)
-anno$TST_status <- factor(anno$TST_status)
-anno$sample_type <- factor(anno$sample_type)
+# make up metadata/covariates
+# NOTE: this is a great way to show confounders/batch effects !!!
+anno <- as.data.frame(cbind(samples, rep(c("M","F"), length(samples)/2)))
+colnames(anno) <- c("sample", "gender")
+anno$ptid <- gsub("_MEDIA|_STIM", "", anno$sample)
+anno$stim <- gsub("p[0-9]{3}_", "", anno$sample)
+
+# at least *some* of our covariates aren't completely confounded
+anno$age <- sample(c(5:60), 100, replace=TRUE)
+anno$vaccStatus <- sample(rep(c("Y","N","N","Y","UNKNOWN"), nrow(anno)/5))
 
 # for coloring MDS plots
-colTB <- anno$TB_status
+colvac <- anno$vaccStatus
 
 # cut() will discretize and create factors for us
 colage <- cut(anno$age, breaks=c(0,10,30,60), laels=c("children","teens","middleage", "elderly"))
 
 # create model matrix and corresponding labels for contrasts
-mmatrix <- model.matrix(~0+TST_status, data=anno)
+mmatrix <- model.matrix(~gender+vaccStatus, data=anno)
 cons <- colnames(mmatrix)[-1] 
-labs <- c("pttype", "gender", "pttype*gender")
-
 
 # normalize using voom
 normy <- calcNormFactors(dat)
