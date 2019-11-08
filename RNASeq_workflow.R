@@ -10,7 +10,9 @@ library(biomaRt)
 library(org.Hs.eg.db)
 library(topGO)
 
-## generate dummy data:
+######################
+# GENERATE DUMMY DATA
+######################
 
 # get a bunch of human gene names
 genes <- unlist(lookUp(as.character(1:50000), 'org.Hs.eg', 'SYMBOL')) 
@@ -28,6 +30,7 @@ samples <- c(paste0(ptids,"_MEDIA"), paste0(ptids,"_STIM"))
 colnames(counts) <- samples
 rownames(counts) <- genes
 
+
 # create ExpressionSet
 dat <- ExpressionSet(assayData=as.matrix(counts))
 
@@ -42,11 +45,20 @@ anno$stim <- gsub("p[0-9]{3}_", "", anno$sample)
 anno$age <- sample(c(5:60), 100, replace=TRUE)
 anno$vaccStatus <- sample(rep(c("Y","N","N","Y","UNKNOWN"), nrow(anno)/5))
 
-# for coloring MDS plots
+# !!! IMPORTANT: make sure the samples' metadata are in the same order
+# as the columns of the count matrix !!!
+anno <- anno[order(anno$sample),] 
+counts <- counts[,order(colnames(counts))] 
+
+# for coloring MDS plots later
 colvac <- anno$vaccStatus
 
 # cut() will discretize and create factors for us
 colage <- cut(anno$age, breaks=c(0,10,30,60), laels=c("children","teens","middleage", "elderly"))
+
+##############################
+# MODEL MATRIX & NORMALIZATION
+##############################
 
 # create model matrix and corresponding labels for contrasts
 mmatrix <- model.matrix(~gender+vaccStatus, data=anno)
@@ -57,6 +69,10 @@ normy <- calcNormFactors(dat)
 libNorm <- colSums(exprs(dat))*normy
 v <- voom(exprs(dat), design=mmatrix, plot=FALSE, lib.size=libNorm)
 ranCor <- duplicateCorrelation(v, design=mmatrix, block=anno$subject)$consensus.correlation
+
+###############################
+# QUERYING GENE INFORMATION
+###############################
 
 # look up gene symbols' chromosomal location on ENSEMBL
 # explicitly set which server we use, since mirrors can go down for maintenance
@@ -126,6 +142,9 @@ map <- merge(mouse, E2GN, by="ensembl_gene_id")
 map$mmusculus_homolog_associated_gene_name <- toupper(map$mmusculus_homolog_associated_gene_name)
 map[c("hgnc_symbol","mmusculus_homolog_associated_gene_name")]
 
+##############################
+# FILTERING GENES
+##############################
 
 # these are the genes actually in our data matrix
 expressedGenes <- rownames(v$E)
@@ -134,6 +153,9 @@ expressedGenes <- rownames(v$E)
 chrYgenes <- intersect(expressedGenes, subset(chrMap, chromosome_name=="Y")$external_gene_name)
 eDatnoY <- ExpressionSet(assayData=as.matrix(counts[!rownames(counts) %in% chrYgenes,]))
 
+###############################
+#  M.D.S. PLOTTING
+###############################
 
 # ... and see how the data separates without sex genes
 # plotMDS can either take a voom-transformed structure like `vDatnoY` below...
@@ -148,7 +170,10 @@ plotMDS(eDatnoY, col=rainbow(length(unique(colage)))[as.numeric(colage)])
 aovCon <- makeContrasts(status=(negTST - posTST),
                         levels=mmatrix)
 
-### Differentially Expressed Genes (DEG) analysis
+################################################## 
+# DIFFERENTIALLY-EXPRESSED GENES (D.E.G.) ANALYSIS
+##################################################
+
 # fit different models
 fit1 <- lmFit(v, mmatrix, block=anno$subject, correlation=ranCor)
 fit2 <- contrasts.fit(fit1, aovCon)
@@ -161,7 +186,10 @@ for(i in 1:ncol(aovCon)) {
 }
 
 
-### Gene Set Enrichment Analysis (GSEA) using CAMERA
+################################################## 
+# GENE SET ENRICHMENT ANALYSIS (G.S.E.A)
+##################################################
+
 # load GMT files (http://software.broadinstitute.org/gsea/msigdb/collections.jsp)
 # GMT files can be concatenated together
 FDRCut <- 0.2
@@ -190,7 +218,11 @@ for(i in 1:length(cons)) {
   comboGSEA[[i]] <- res
 }
 
-### GeneOntology analysis using topGO
+###################################
+# GENE ONTOLOGY (G.O.) ANALYSIS
+###################################
+
+# using TopGO
 # which in turn requires annotation from org.Hs.eg.db
 # read in a table of genes, logFC, AveExpr, t, P.Value, adj.P.Val and B 
 # from limma's topTable()
