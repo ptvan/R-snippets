@@ -1,17 +1,11 @@
 library(Biobase)
-library(data.table)
 library(ggplot2)
-library(gridExtra)
 library(limma)
 library(edgeR)
 library(DESeq2)
-library(xtable)
 library(GSEABase)
-library(DT)
-library(plyr)     
+library(dplyr)     
 library(stringr)  
-library(plotly)
-library(cowplot)
 library(biomaRt)
 library(org.Hs.eg.db)
 library(topGO)
@@ -20,7 +14,7 @@ library(topGO)
 
 # get a bunch of human gene names
 genes <- unlist(lookUp(as.character(1:50000), 'org.Hs.eg', 'SYMBOL')) 
-genes <- genes[!is.na(genes)]
+genes <- sample(unique(genes[!is.na(genes)]))
 names(genes) <- NULL
 
 # generate some dummy subjects, p001 to p050
@@ -143,8 +137,8 @@ eDatnoY <- ExpressionSet(assayData=as.matrix(counts[!rownames(counts) %in% chrYg
 
 # ... and see how the data separates without sex genes
 # plotMDS can either take a voom-transformed structure like `vDatnoY` below...
-plotMDS(vDatnoY, col=rainbow(length(unique(colTB)))[as.numeric(colTB)],  main="TB status, chrY genes removed", pch=1)
-legend("bottomleft", c("noTB","TB"), pch=1, col=c("#FF0000FF", "#00FFFFFF"))
+plotMDS(vDatnoY, col=rainbow(length(unique(colvac)))[as.numeric(colvac)],  main="Vaccinaition status, chrY genes removed", pch=1)
+legend("bottomleft", c("yes","no", "unknown"), pch=1, col=c("#FF0000FF", "#00FFFFFF", "#0000FFFF"))
 
 # ... or just a bare expression set, `eDatnoY`
 plotMDS(eDatnoY, col=rainbow(length(unique(colage)))[as.numeric(colage)])
