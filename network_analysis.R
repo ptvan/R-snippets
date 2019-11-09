@@ -65,6 +65,10 @@ pcit(corMat)
 # filter unconnected vertices
 net <- induced_subgraph(net, v=which(igraph::degree(g=net, v=V(net))>1))
 
+############################
+# CREATE NETWORK FROM "SEED" GENES
+############################
+
 # create a network by expanding some "seed" genes with their KEGG-annotated pathway co-members
 myGenes <- c("TLR1"
                ,"TLR2"

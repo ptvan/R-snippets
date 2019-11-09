@@ -76,7 +76,6 @@ ranCor <- duplicateCorrelation(v, design=mmatrix, block=anno$subject)$consensus.
 
 # look up gene symbols' chromosomal location on ENSEMBL
 # explicitly set which server we use, since mirrors can go down for maintenance
-
 ensemblMart <- useMart("ensembl"
               ,host = "www.ensembl.org"
               ,ensemblRedirect = FALSE)
