@@ -174,7 +174,7 @@ aovCon <- makeContrasts(status=(negTST - posTST),
 ##################################################
 
 # fit different models
-fit1 <- lmFit(v, mmatrix, block=anno$subject, correlation=ranCor)
+fit1 <- lmFit(v, mmatrix, block=anno$ptid, correlation=ranCor)
 fit2 <- contrasts.fit(fit1, aovCon)
 fit2 <- eBayes(fit2, trend=FALSE)
 
