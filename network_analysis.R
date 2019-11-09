@@ -4,7 +4,34 @@ library(igraph)
 library(ggraph2)
 library(ggnetwork)
 
-adjMat  <- adjacency( t(vDat$E[which(rownames(vDat$E)%in%geneList$gene),]))
+######################
+# GENERATE DUMMY DATA
+######################
+
+# get a bunch of human gene names
+genes <- unlist(lookUp(as.character(1:50000), 'org.Hs.eg', 'SYMBOL')) 
+genes <- sample(unique(genes[!is.na(genes)]))
+names(genes) <- NULL
+
+# generate some dummy subjects, p001 to p050
+ptids <- paste0("p",str_pad(as.character(1:50), 3, "left", "0"))
+
+# generate dummy RNASeq counts
+counts <- matrix(sample(1:1e6, length(genes)*length(ptids)), nrow=length(genes), ncol=length(ptids)*2)
+
+# each subject has "MEDIA" and "STIM" samples
+samples <- c(paste0(ptids,"_MEDIA"), paste0(ptids,"_STIM"))
+colnames(counts) <- samples
+rownames(counts) <- genes
+
+# create ExpressionSet
+dat <- ExpressionSet(assayData=as.matrix(counts))
+
+######################
+# CREATE ADJACENCY MATRIX
+######################
+
+adjMat  <- adjacency( t(dat[which(rownames(dat)%in%geneList$gene),]))
 diag(adjMat) <- 0
 g <- graph_from_adjacency_matrix(adjMat, weighted=T, mode=c("undirected"))
 
@@ -15,8 +42,9 @@ g2 <- subgraph.edges(g, E(g)[weight>0.1])
 V(g2)$logFC <- geneList[match(vertex_attr(g2, "name"), geneList$gene),]$logFC
 V(g2)$geneName <- V(g2)$name
 
-
-# plotting
+######################
+# PLOTTING
+######################
 pu <- colorRampPalette(c("purple","mediumorchid","purple4"))(20)
 ye <- colorRampPalette(c("lemonchiffon", "khaki","yellow"))(20)
 
