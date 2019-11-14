@@ -76,7 +76,6 @@ ranCor <- duplicateCorrelation(v, design=mmatrix, block=anno$subject)$consensus.
 
 # look up gene symbols' chromosomal location on ENSEMBL
 # explicitly set which server we use, since mirrors can go down for maintenance
-
 ensemblMart <- useMart("ensembl"
               ,host = "www.ensembl.org"
               ,ensemblRedirect = FALSE)
@@ -175,7 +174,7 @@ aovCon <- makeContrasts(status=(negTST - posTST),
 ##################################################
 
 # fit different models
-fit1 <- lmFit(v, mmatrix, block=anno$subject, correlation=ranCor)
+fit1 <- lmFit(v, mmatrix, block=anno$ptid, correlation=ranCor)
 fit2 <- contrasts.fit(fit1, aovCon)
 fit2 <- eBayes(fit2, trend=FALSE)
 
