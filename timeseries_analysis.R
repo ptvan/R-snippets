@@ -1,6 +1,8 @@
 library(lubridate)
 library(tidyr)
 library(dplyr)
+library(zoo)
+library(forecast)
 
 # import data
 steps <- read.csv("stepsData.csv")
@@ -22,4 +24,6 @@ steps <- steps %>%
   mutate(month = month(startDate)) %>%
   mutate(day = day(startDate)) 
 
-  
+as.ts(steps)
+
+ma(steps, order=52, centre = T)
