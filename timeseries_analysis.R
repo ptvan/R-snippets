@@ -22,7 +22,7 @@ steps <- steps %>%
 # create a ts object
 steps_ts <- ts(steps$stepsWalked, start = c(2015,yday(steps$startDate[1])), frequency = 365)
 
-# find a weekly trend
+# get weekly trends using moving average
 steps_trend <- ma(steps_ts, order=52, centre = T)
 
 # plot data with trend overlaid
@@ -55,10 +55,17 @@ biking <- biking %>%
   mutate(startDate = as.character(startDate)) 
 
 # fill in missing dates & merge
-missing_dates <- as.character(seq(as.Date(biking$startDate[1]), as.Date(biking$startDate[279]), by=1)) %>%
+missing_dates <- as.character(seq(as.Date(biking$startDate[1]), as.Date(biking$startDate[nrow(biking)]), by=1)) %>%
   setdiff(.,  biking$startDate) %>%
   data.frame()
 colnames(missing_dates) <- c("startDate")
-missing_dates$kcalBurned = 0
-missing_dates$milesCycled = 0  
-biking <- rbind(biking, missing_dates) %>% read.zoo(format="%Y-%m-%d")
+missing_dates$kcalBurned = NA
+missing_dates$milesCycled = NA  
+biking <- rbind(biking, missing_dates) %>% 
+  read.zoo(format="%Y-%m-%d")
+
+steps <- read.zoo(steps,format="%Y-%m-%d")
+
+#### COMBINED DATA
+health <- merge(biking, steps) %>% 
+  na.fill(0)
