@@ -22,6 +22,9 @@ steps <- steps %>%
 # create a ts object
 steps_ts <- ts(steps$stepsWalked, start = c(2015,yday(steps$startDate[1])), frequency = 365)
 
+# basic plotting
+monthplot(steps_ts)
+
 # get weekly trends using moving average
 steps_trend <- ma(steps_ts, order=52, centre = T)
 
@@ -54,7 +57,7 @@ biking <- biking %>%
   summarize(kcalBurned = sum(kcalBurned),milesCycled = sum(milesCycled)) %>%
   mutate(startDate = as.character(startDate)) 
 
-# fill in missing dates & merge
+# fill in data for missing dates & merge with real data
 missing_dates <- as.character(seq(as.Date(biking$startDate[1]), as.Date(biking$startDate[nrow(biking)]), by=1)) %>%
   setdiff(.,  biking$startDate) %>%
   data.frame()
@@ -64,8 +67,14 @@ missing_dates$milesCycled = NA
 biking <- rbind(biking, missing_dates) %>% 
   read.zoo(format="%Y-%m-%d")
 
+# convert steps data.frame into a zoo object
 steps <- read.zoo(steps,format="%Y-%m-%d")
 
 #### COMBINED DATA
+
+# merging steps and biking zoo objects, filling out NAs with zero
 health <- merge(biking, steps) %>% 
   na.fill(0)
+
+# calculate ACF & partial ACF to test for stationarity 
+pacf(health$steps, na.action = na.pass)
