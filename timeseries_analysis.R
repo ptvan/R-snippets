@@ -19,11 +19,30 @@ steps <- steps %>%
   mutate(startDate = as.Date(startDate)) %>%
   mutate(endDate = as.Date(endDate)) %>%
   group_by(startDate) %>%
-  summarize(stepsWalked = sum(stepsWalked)) %>%
-  mutate(year = year(startDate)) %>%
-  mutate(month = month(startDate)) %>%
-  mutate(day = day(startDate)) 
+  summarize(stepsWalked = sum(stepsWalked))
 
-as.ts(steps)
+# create a ts
+steps_ts <- ts(steps$stepsWalked, start = c(2015,yday(steps$startDate[1])), frequency = 365)
 
-ma(steps, order=52, centre = T)
+# find a weekly trend
+steps_trend <- ma(steps_ts, order=7, centre = T)
+
+# plot data with trend overlaid
+plot(steps_ts, main="step counts")
+lines(steps_trend, col="red")
+
+# detrend
+steps_detrended_ts <- steps_ts / steps_trend
+plot(steps_detrended_ts, main="step counts, detrended")
+
+# decompose into seasonal, trend and random
+steps_stl <- stl(steps_ts, "periodic")
+
+steps_stl_seasonal <- steps_stl$time.series[,1]
+steps_stl_trend <- steps_stl$time.series[,2]
+steps_stl_random <- steps_stl$time.series[,3]
+
+par(mfrow=c(3,1))
+plot(steps_stl_seasonal, main="seasonal component")
+plot(steps_stl_trend, main="trend component")
+plot(steps_stl_random, main="random component")
