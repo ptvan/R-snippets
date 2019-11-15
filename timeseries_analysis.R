@@ -25,7 +25,7 @@ steps <- steps %>%
 steps_ts <- ts(steps$stepsWalked, start = c(2015,yday(steps$startDate[1])), frequency = 365)
 
 # find a weekly trend
-steps_trend <- ma(steps_ts, order=7, centre = T)
+steps_trend <- ma(steps_ts, order=52, centre = T)
 
 # plot data with trend overlaid
 plot(steps_ts, main="step counts")
