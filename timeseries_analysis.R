@@ -77,4 +77,5 @@ health <- merge(biking, steps) %>%
   na.fill(0)
 
 # calculate ACF & partial ACF to test for stationarity 
-pacf(health$steps, na.action = na.pass)
+acf(health$milesCycled, na.action = na.pass, main="milesCycled ACF")
+pacf(health$steps, na.action = na.pass, main="steps pACF")
