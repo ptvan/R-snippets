@@ -3,6 +3,7 @@ library(tidyr)
 library(dplyr)
 library(zoo)
 library(forecast)
+library(changepoint)
 
 ### STEPS DATA
 steps <- read.csv("stepsData.csv")
@@ -49,6 +50,24 @@ plot(steps_stl_trend, main="trend component")
 plot(steps_stl_random, main="random component")
 
 
+# changepoint detection
+
+# try to figure out our own penalty vector...
+# penalties <- seq(0, 20,.2)
+# 
+# tryPenalty <- function(data, pen){
+#   ans <- cpt.mean(data, test.stat="Normal", method = "PELT", penalty = "Manual", pen.value = penalties) 
+#   return(length(cpts(ans)) +1)
+# }
+# 
+# tryPenalty(steps_ts, penalties)
+# 
+# elbowplotData <- unlist(lapply(penalties, function(p) 
+#   tryPenalty(data = steps_ts, pen = p)))
+
+# ... or just let the function do it...
+plot(cpt.mean(steps_ts, penalty = "Hannan-Quinn"), ylab="steps", main="change point detection by Hannan-Quinn")
+
 ### BIKING DISTANCE DATA
 biking <- read.csv("cyclingData.csv", header=T)
 biking <- biking %>%
@@ -79,3 +98,4 @@ health <- merge(biking, steps) %>%
 # calculate ACF & partial ACF to test for stationarity 
 acf(health$milesCycled, na.action = na.pass, main="milesCycled ACF")
 pacf(health$steps, na.action = na.pass, main="steps pACF")
+
