@@ -66,7 +66,10 @@ plot(steps_stl_random, main="random component")
 #   tryPenalty(data = steps_ts, pen = p)))
 
 # ... or just let the function do it...
-plot(cpt.mean(steps_ts, penalty = "Hannan-Quinn"), ylab="steps", main="change point detection by Hannan-Quinn")
+plot(cpt.mean(steps_ts, penalty = "Hannan-Quinn"), ylab="steps", main="change point detection, Hannan-Quinn penalty, varying mean")
+
+# can also work when both mean and variance are varying
+plot(cpt.meanvar(steps_ts, penalty = "MBIC"), ylab="steps", main="change point detection, MBIC penalty, varying mean & variance")
 
 ### BIKING DISTANCE DATA
 biking <- read.csv("cyclingData.csv", header=T)
