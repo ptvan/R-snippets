@@ -4,6 +4,7 @@ library(tidyr)
 library(dplyr)
 # Thank you for Chad Young for useful discussions
 
+### UNIVARIATE CASE
 # read in our iPhone daily step counts
 steps <- read.csv("stepsData.csv")
 
@@ -46,3 +47,20 @@ for (d in 1:length(densities)){
   lines(density(densities[[d]]), lty = d)
 }
 legend("topright", legend=1:length(densities), lty=1:length(densities))
+
+### MULTIVARIATE
+# probably not a great idea since running and biking are temporally independent...
+biking <- read.csv("cyclingData.csv", header=T)
+biking <- biking %>%
+  group_by(startDate) %>%
+  summarize(kcalRun = sum(kcalBurned),milesCycled = sum(milesCycled)) %>%
+  mutate(startDate = as.Date(startDate))  %>%
+  dplyr::filter(milesCycled < 20) %>%
+  dplyr::select(c(startDate,milesCycled))
+
+health <- merge(biking, steps, by="startDate", all=TRUE)
+health[is.na(health$milesCycled),]$milesCycled <- 0
+health <- dplyr::select(health, c(milesCycled, stepsWalked))
+
+mdens <- densityMclust(health)
+plot(mdens, what="density", type="persp")
