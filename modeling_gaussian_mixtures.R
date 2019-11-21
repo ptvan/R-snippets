@@ -2,6 +2,7 @@ library(mclust)
 library(lubridate)
 library(tidyr)
 library(dplyr)
+library(mvtnorm)
 # Thank you for Chad Young for useful discussions
 
 ### UNIVARIATE CASE
@@ -62,5 +63,19 @@ health <- merge(biking, steps, by="startDate", all=TRUE)
 health[is.na(health$milesCycled),]$milesCycled <- 0
 health <- dplyr::select(health, c(milesCycled, stepsWalked))
 
-mdens <- densityMclust(health)
+mdens <- densityMclust(health, classification=TRUE)
+
+# retrieve model summary: model type, log-likelihood, BIC, etc.
+summary(mdens)
+
+# cluster membership
+mdens$classification
+
+# plot the multivariate density
 plot(mdens, what="density", type="persp")
+
+# retrieve the covariance matrix
+covMat <- cov(health)
+
+# resample
+rmvnorm(n = nrow(health), mean=mdens$parameters$mean, sigma=mdens$parameters$variance$sigma[,,8])
