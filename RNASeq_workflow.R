@@ -44,9 +44,11 @@ anno$stim <- gsub("p[0-9]{3}_", "", anno$sample)
 # at least *some* of our covariates aren't completely confounded
 anno$age <- sample(c(5:60), 100, replace=TRUE)
 anno$vaccStatus <- sample(rep(c("Y","N","N","Y","UNKNOWN"), nrow(anno)/5))
+anno$school <- factor(rep(c("Springfield","Hogwarts","Xavier","Xavier","Springfield"),2))
 
 # !!! IMPORTANT: make sure the samples' metadata are in the same order
-# as the columns of the count matrix !!!
+# as the columns of the count matrix !!! This is especially critical
+# if there has been merging of the annotations, which reorders the samples silently
 anno <- anno[order(anno$sample),] 
 counts <- counts[,order(colnames(counts))] 
 
@@ -60,15 +62,16 @@ colage <- cut(anno$age, breaks=c(0,10,30,60), laels=c("children","teens","middle
 # MODEL MATRIX & NORMALIZATION
 ##############################
 
-# create model matrix and corresponding labels for contrasts
-mmatrix <- model.matrix(~gender+vaccStatus, data=anno)
-cons <- colnames(mmatrix)[-1] 
+# create model matrices for different models and corresponding labels for contrasts
+mmatrix_stim <- model.matrix(~stim, data = anno)
+mmatrix_full <- model.matrix(~stim+school, data=anno)
+cons <- c("stim", "school")
 
 # normalize using voom
 normy <- calcNormFactors(dat)
 libNorm <- colSums(exprs(dat))*normy
-v <- voom(exprs(dat), design=mmatrix, plot=FALSE, lib.size=libNorm)
-ranCor <- duplicateCorrelation(v, design=mmatrix, block=anno$subject)$consensus.correlation
+data_voomed <- voom(exprs(dat), design=mmatrix_full, plot=FALSE, lib.size=libNorm)
+ranCor <- duplicateCorrelation(v, design=mmatrix_full, block=anno$subject)$consensus.correlation
 
 ###############################
 # QUERYING GENE INFORMATION
@@ -165,24 +168,24 @@ legend("bottomleft", c("yes","no", "unknown"), pch=1, col=c("#FF0000FF", "#00FFF
 plotMDS(eDatnoY, col=rainbow(length(unique(colage)))[as.numeric(colage)])
 
 
-# make the contrasts matrix
-aovCon <- makeContrasts(status=(negTST - posTST),
-                        levels=mmatrix)
-
 ################################################## 
 # DIFFERENTIALLY-EXPRESSED GENES (D.E.G.) ANALYSIS
 ##################################################
 
 # fit different models
-fit1 <- lmFit(v, mmatrix, block=anno$ptid, correlation=ranCor)
-fit2 <- contrasts.fit(fit1, aovCon)
+fit1 <- lmFit(data_voomed, mmatrix_stim, block=anno$ptid, correlation=ranCor)
+fit2 <- lmFit(data_voomed, mmatrix_full, block=anno$ptid, correlation=ranCor)
 fit2 <- eBayes(fit2, trend=FALSE)
 
 # generate the table of top DEGs from the linear model fit
+# for contrasts with 2 factors, sort by t-values
+# for contrasts with >2 factors, sort by F-values
+
 allOut <- list()
-for(i in 1:ncol(aovCon)) {
-  allOut[[i]] <- topTable(fit2, number=nrow(v), coef=i, sort="P")
-}
+allOut[[1]] <- topTable(fit2, number=nrow(data_voomed), coef="stimSTIM", sort="P")
+allOut[[2]] <- topTable(fit2, number=nrow(data_voomed), coef=grep("school",colnames(fit2)), sort="F")
+
+names(allOut) <- cons
 
 
 ################################################## 
