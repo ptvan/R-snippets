@@ -4,9 +4,11 @@ library(dplyr)
 library(zoo)
 library(forecast)
 library(changepoint)
+library(AnomalyDetection)
+library(ggplot2)
 
 ### STEPS DATA
-steps <- read.csv("stepsData.csv")
+steps <- read.csv("~/working/datasets/iphone_health/stepsData.csv")
 
 # clean things up
 # steps <- steps %>% 
@@ -102,3 +104,16 @@ health <- merge(biking, steps) %>%
 acf(health$milesCycled, na.action = na.pass, main="milesCycled ACF")
 pacf(health$steps, na.action = na.pass, main="steps pACF")
 
+
+##### TWITTER'S ANOMALY DETECTION PACKAGE
+# AnomalyDetection generates errors with ggplot2 v3.0+, 
+# so we plot things manually
+
+steps$startDate <- as.POSIXct(steps$startDate)
+res <- AnomalyDetectionTs(steps, max_anoms=0.02, direction='both', plot=FALSE)
+res$anoms$timestamp <- as.POSIXct(res$anoms$timestamp)
+
+ggplot(steps, aes(startDate, stepsWalked)) + 
+  geom_line(data=steps, aes(startDate, stepsWalked), color='blue') + 
+  geom_point(data=res$anoms, aes(timestamp, anoms), color='red') +
+  theme_bw()
