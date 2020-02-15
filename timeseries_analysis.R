@@ -117,3 +117,28 @@ ggplot(steps, aes(startDate, stepsWalked)) +
   geom_line(data=steps, aes(startDate, stepsWalked), color='blue') + 
   geom_point(data=res$anoms, aes(timestamp, anoms), color='red') +
   theme_bw()
+
+###### FORECASTING ######
+steps_ts %>%
+  ets() %>%
+  forecast() %>%
+  autoplot()
+
+steps_ts %>%
+  auto.arima() %>%
+  forecast(h=20) %>%
+  autoplot()
+
+steps_ts %>%
+  stlm(modelfunction=ar) %>%
+  forecast(h=36) %>%
+  autoplot()
+
+steps_ts %>%
+  stlf(lambda=0) %>%
+  autoplot()
+
+steps_ts %>%
+  tbats() %>%
+  forecast() %>%
+  autoplot()
