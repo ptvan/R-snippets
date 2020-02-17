@@ -18,3 +18,7 @@ iphone_steps$insert(steps)
 iphone_steps$count()
 
 print(iphone_steps$find('{}'))
+
+iphone_steps$find('{"startDate": "2015-12-07"}')
+
+iphone_steps$drop()
