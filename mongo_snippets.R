@@ -9,7 +9,7 @@ stepsData <- read.csv("~/working/datasets/iphone_health/stepsData.csv")
 
 # day-level stepcount data
 stepsData <- stepsData %>%
-  mutate(startDate = as.Date(startDate)) %>%
+  mutate(startDate = strptime(startDate, "%Y-%m-%dT%H:%M:%SZ", 'UTC') %>%
   group_by(startDate) %>%
   summarize(stepsWalked = sum(stepsWalked))
 
@@ -18,10 +18,25 @@ stepsDB <- mongo("steps")
 stepsDB$insert(stepsData)
 stepsDB$count()
 
+# FIND/SELECT
+# show all
 print(stepsDB$find('{}'))
 
-# FIND
-stepsDB$find('{"startDate": "2015-12-07"}')
+# exact match
+stepsDB$find(query = '{"startDate": "2015-12-07"}')
+
+# sort, "_id" is included by default so we have to explicitly exclude it 
+stepsDB$find(fields = '{"startDate":true, "stepsWalked":true, "_id":false}'
+             , sort='{"stepsWalked": -1}')
+
+# date range
+stepsDB$find(
+  query = '{"startDate": { "$gte" : { "$date" : "2017-01-01T00:00:00Z" }}}',
+  fields = '{"startDate" : true, "stepsWalked":true, "_id": false}'
+)
+
+# UPDATE
+stepsDB$update('{"startDate": "2015-12-07"}', '{"$set":{"stepsWalked":10000}}')
 
 # DROP
 stepsDB$drop()
