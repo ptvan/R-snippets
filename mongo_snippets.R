@@ -5,20 +5,31 @@ library(magrittr)
 m <- mongo(collection = "test", db = "test", url = "mongodb://localhost",
            verbose = FALSE, options = ssl_options())
 
-steps <- read.csv("~/working/datasets/iphone_health/stepsData.csv")
+stepsData <- read.csv("~/working/datasets/iphone_health/stepsData.csv")
 
-# day-level data
-steps <- steps %>%
+# day-level stepcount data
+stepsData <- stepsData %>%
   mutate(startDate = as.Date(startDate)) %>%
   group_by(startDate) %>%
   summarize(stepsWalked = sum(stepsWalked))
 
-iphone_steps <- mongo("steps")
-iphone_steps$insert(steps)
-iphone_steps$count()
+# INSERT
+stepsDB <- mongo("steps")
+stepsDB$insert(stepsData)
+stepsDB$count()
 
-print(iphone_steps$find('{}'))
+print(stepsDB$find('{}'))
 
-iphone_steps$find('{"startDate": "2015-12-07"}')
+# FIND
+stepsDB$find('{"startDate": "2015-12-07"}')
 
-iphone_steps$drop()
+# DROP
+stepsDB$drop()
+
+# run arbitrary commands
+mongoCon <- mongo()
+mongoCon$run('{"listCollections":1}')
+
+# some commands can only be run against the `admin` database
+admin <- mongo(db = "admin")
+admin$run('{"listDatabases":1}')
