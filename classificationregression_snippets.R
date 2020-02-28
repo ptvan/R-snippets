@@ -2,19 +2,31 @@
 # Naive Bayes
 ##########################
 ## using the naivebayes package
+library(tidyverse)
 library(naivebayes)
 
-n <- 100
 set.seed(1)
-data <- data.frame(class = sample(c("classA", "classB"), n, TRUE)
-                   ,bern = sample(LETTERS[1:2], n, TRUE)
-                   ,cat  = sample(letters[1:3], n, TRUE)
-                   ,logical = sample(c(TRUE,FALSE), n, TRUE)
-                   ,norm = rnorm(n),count = rpois(n, lambda = c(5,15)))
 
-train <- data[1:95, ]
-test <- data[96:100, -1]
-nb <- naive_bayes(class ~ ., train, usepoisson = TRUE)
+# abalone data from https://archive.ics.uci.edu/ml/datasets/Abalone
+# NOTE: length/diameter are likely correlated, while naive Bayes assumes
+# covars to be independent !
+
+data <- read.csv("abalone.csv")
+colnames(data) <- c("sex"
+                  ,"length"
+                  ,"diameter"
+                  ,"height"
+                  ,"weight_whole"
+                  ,"weight_shucked"
+                  ,"weight_viscera"
+                  ,"weight_shell"
+                  ,"n_rings")
+
+n <- nrow(data)
+
+train <- data[1:floor(n*0.9), ]
+test <- data[(n-floor(n*0.1)):n,-1] # remember to exclude the labels !
+nb <- naive_bayes(sex ~ ., train, usepoisson = TRUE)
 summary(nb)
 # classification
 predict(nb, test, type = "class")
