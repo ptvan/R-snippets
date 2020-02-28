@@ -55,3 +55,8 @@ train <- sample(1:150, 75)
 plda = predict(object = r, # predictions
                newdata = iris[-train, ])
 head(plda$class)
+
+ldahist(plda$x[,2], g = plda$class)
+
+plot(plda$x[,1], plda$x[,2])
+text(plda$x[,1], plda$x[,2], plda$class, cex = 0.7, pos = 4, col = "red")
