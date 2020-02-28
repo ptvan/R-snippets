@@ -3,7 +3,7 @@
 ##########################
 ## using the naivebayes package
 library(tidyverse)
-library(naivebayes)
+library(ggplot2)
 
 set.seed(1)
 
@@ -44,19 +44,14 @@ r <- lda(formula = Species ~ .,
          data = iris,
          prior = c(1,1,1)/3)
 
-r2 <- lda(formula = Species ~ .,
-          data = iris,
-          prior = c(1,1,1)/3,
-          CV = TRUE)
-
-
 train <- sample(1:150, 75)
 
 plda = predict(object = r, # predictions
                newdata = iris[-train, ])
 head(plda$class)
-
 ldahist(plda$x[,2], g = plda$class)
 
-plot(plda$x[,1], plda$x[,2])
-text(plda$x[,1], plda$x[,2], plda$class, cex = 0.7, pos = 4, col = "red")
+# ggplot is a little nicer...
+irisProjection <- cbind(scale(as.matrix(iris[,-5]),scale=FALSE) %*% r$scaling,iris[,5,drop=FALSE])
+ggplot(data=irisProjection,aes(x=LD1,y=LD2,col=Species)) +
+ geom_point()   
