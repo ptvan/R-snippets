@@ -58,3 +58,8 @@ x <- array_reshape(x, c(1, dim(x)))
 x <- imagenet_preprocess_input(x)
 
 features <- model %>% predict
+
+### Generative Deep Learning
+model <- keras_model_sequential() 
+model %>%    
+  layer_dense(units = 256, activation = 'relu', input_shape = c(784)) %>% 
