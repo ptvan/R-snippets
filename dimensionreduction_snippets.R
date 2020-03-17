@@ -1,2 +1,7 @@
 library(uwot)
-library(RTsne)
+library(Rtsne)
+library(kernlab)
+library(keras)
+
+
+
