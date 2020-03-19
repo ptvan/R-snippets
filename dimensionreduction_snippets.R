@@ -17,7 +17,9 @@ dat <- read.csv("~/working/datasets/HTRU.csv")
 colnames(dat) <- c(paste0("var", 1:(ncol(dat)-1)), "class")
 dat <- dat[sample(nrow(dat),5000),]
 
+###########
 # T-SNE
+###########
 tsne_out <- Rtsne(dat[,c(1:8)],perplexity=30,theta=0.0) 
 
 tsne_out <- tsne_out$Y %>%
@@ -26,7 +28,9 @@ tsne_out <- tsne_out$Y %>%
           inset("class", value=dat$class) %>%
           mutate(class = as.factor(class))
 
+#######
 # UMAP
+#######
 umap_out <- umap(dat, init = "spca") %>%
           as.data.frame() %>% 
           set_colnames(c("X","Y")) %>%
@@ -37,8 +41,9 @@ ggplot(umap_out) +
       aes(x=X, y=Y, col=class) +
       geom_point()
 
-
+############
 # KERNEL PCA
+############
 kpca_out <- kpca(dat, features=2) 
 rotated(kpca_out)
 
