@@ -42,5 +42,8 @@ ggplot(umap_out) +
 kpca_out <- kpca(dat, features=2) 
 rotated(kpca_out)
 
-
+# SAMMON
+sammon_out <- sammon(dist(dat[,-180]))
+plot(sammon_out$points, type="n")
+text(sammon_out$points, labels = as.character(1:nrow(dat[,-180])))
 
