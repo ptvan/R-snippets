@@ -13,16 +13,20 @@ library(ggplot2)
 
 # seizure dataset from the UCI ML repository
 # https://archive.ics.uci.edu/ml/datasets/Epileptic+Seizure+Recognition
+dat <- read.csv("~/working/datasets/HTRU.csv")
+colnames(dat) <- c(paste0("var", 1:(ncol(dat)-1)), "class")
 
-dat <- read.csv("~/working/datasets/seizure/data.csv")
-colnames(dat) <- gsub("X", "var", colnames(dat))
+# T-SNE
+tic()
+tsne_out <- Rtsne(dat[,c(1:8)],perplexity=30,theta=0.0) 
+toc()
 
+# UMAP
 umap_out <- umap(dat, init = "spca") %>%
           as.data.frame() %>% 
           set_colnames(c("X","Y")) %>%
           inset("class", value=dat$y) %>%
           mutate(class = as.factor(class))
-          
 
 ggplot(umap_out) +
       aes(x=X, y=Y, col=class) +
