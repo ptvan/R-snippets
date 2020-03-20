@@ -2,15 +2,34 @@ library(mlbench)
 library(dbscan)
 library(cluster)
 library(mclust)
+library(meanShiftR)
 
 ## load 2D Swiss rolls from mlbench pkg, discard class info
 truth <- mlbench.spirals(500, 1, 0.025)
 data <- truth$x
 
 ###########
+#  K-means
+###########
+# needs K
+km <- kmeans(data, centers = 2)
+
+
+#############
+# Mean Shift
+############
+# supports multicore acceleration and KDE (second arg)
+ms <- meanShift(data, data,
+          algorithm="KDTREE", 
+          nNeighbor=8, 
+          parameters=c(5,7.1) )
+
+
+###########
 #  DBSCAN
 ###########
-dbscan(data, eps=5)
+# unsupervised
+db <- dbscan(data, eps=5)
 
 ######################
 # Spectral Clustering
@@ -31,4 +50,4 @@ points(data, col=truth$classes, pch=5)
 #######################################
 # Agglomerative hierarchical clustering
 #######################################
-agnes(data)
+ag <- agnes(data)
