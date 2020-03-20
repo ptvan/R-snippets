@@ -1,9 +1,9 @@
-library(mlbench)
+library(mlbench) # provides data generation funcsions
 library(dbscan)
 library(cluster) # provides agnes()
 library(mclust)
 library(meanShiftR)
-library(ClusterR)
+library(ClusterR) # provides GMM
 
 ## load 2D Swiss rolls from mlbench pkg, discard class info
 truth <- mlbench.spirals(500, 1, 0.025)
