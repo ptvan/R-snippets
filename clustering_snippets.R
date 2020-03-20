@@ -1,8 +1,9 @@
 library(mlbench)
 library(dbscan)
-library(cluster)
+library(cluster) # provides agnes()
 library(mclust)
 library(meanShiftR)
+library(ClusterR)
 
 ## load 2D Swiss rolls from mlbench pkg, discard class info
 truth <- mlbench.spirals(500, 1, 0.025)
@@ -46,7 +47,17 @@ points(data, col=truth$classes, pch=5)
 ##########################
 # Gaussian Mixture Models
 ##########################
+gauss2D <- mlbench.2dnormals(10000)$x
+g <- GMM(gauss2D, 2, dist_mode = "maha_dist", seed_mode = "random_subset", km_iter = 10,
+    em_iter = 10, verbose = F)   
 
+plot(gauss2D)
+points(g$centroids,col="red", pch=16)
+
+pr <- predict_GMM(gauss2D, g$centroids, g$covariance_matrices, g$weights)    
+cols <- gsub("1","green",(gsub("0","blue",pr$cluster_labels)))
+plot(gauss2D)
+points(gauss2D,col=cols)
 
 #######################################
 # Agglomerative hierarchical clustering
