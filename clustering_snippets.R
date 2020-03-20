@@ -18,7 +18,8 @@ km <- kmeans(data, centers = 2)
 #############
 # Mean Shift
 ############
-# supports multicore acceleration and KDE (second arg)
+# meanshiftR supports multicore acceleration and KDE (second arg)
+# faster than LPCM and older implementation `MeanShift``
 ms <- meanShift(data, data,
           algorithm="KDTREE", 
           nNeighbor=8, 
