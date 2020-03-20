@@ -62,4 +62,6 @@ points(gauss2D,col=cols)
 #######################################
 # Agglomerative hierarchical clustering
 #######################################
-ag <- agnes(data)
+ag <- agnes(HouseVotes84[,-1])
+cl <- cutree(ag, 2)
+
