@@ -1,20 +1,34 @@
 library(mclust)
 library(lubridate)
-library(tidyr)
 library(dplyr)
 library(mvtnorm)
-# Thank you for Chad Young for useful discussions
+library(mixtools)
 
-### UNIVARIATE CASE
+# Thanks to Chad Young for useful mclust discussions
+
+#############
+# UNIVARIATE 
+############
 # read in our iPhone daily step counts
-steps <- read.csv("stepsData.csv")
+raw <- read.csv("datasets/iphone_health/stepsData.csv")
 
 # day-level data
-steps <- steps %>%
-  mutate(startDate = as.Date(startDate)) %>%
-  group_by(startDate) %>%
+steps <- raw %>%
+  mutate(startDate = factor(as.Date(startDate))) %>%
+  dplyr::select(date = startDate, stepsWalked) %>%
+  group_by(date) %>%
   summarize(stepsWalked = sum(stepsWalked))
 
+## mixtools
+# no mu supplied, data is binned, then K is picked
+mixauto <- normalmixEM(steps$stepsWalked)
+plot(mixauto, density=TRUE)
+
+# K is supplied
+mix4 <- normalmixEM(steps$stepsWalked, k=4)
+plot(mix4, density=TRUE)
+
+## mclust
 # do density estimation, let mclust pick our distribution count for us
 dens <- densityMclust(steps$stepsWalked)
 
@@ -49,7 +63,11 @@ for (d in 1:length(densities)){
 }
 legend("topright", legend=1:length(densities), lty=1:length(densities))
 
-### MULTIVARIATE
+
+##############
+# MULTIVARIATE
+##############
+
 # probably not a great idea since running and biking are temporally independent...
 biking <- read.csv("cyclingData.csv", header=T)
 biking <- biking %>%
