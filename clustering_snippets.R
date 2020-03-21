@@ -47,7 +47,7 @@ points(data, col=truth$classes, pch=5)
 ##########################
 # Gaussian Mixture Models
 ##########################
-gauss2D <- mlbench.2dnormals(10000)$x
+gauss2D <- mlbench.2dnormals(n=10000, cl=2, r=3)
 g <- GMM(gauss2D, 2, dist_mode = "maha_dist", seed_mode = "random_subset", km_iter = 10,
     em_iter = 10, verbose = F)   
 

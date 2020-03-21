@@ -59,7 +59,6 @@ ggplot(data=irisProjection,aes(x=LD1,y=LD2,col=Species)) +
 ##########################
 # XGBOOST
 ##########################
-
 library(xgboost)
 
 data(agaricus.train, package='xgboost')
@@ -94,3 +93,27 @@ print(paste("test-error=", err))
 
 xgb.importance(model = bst)
 xgb.plot.shap(agaricus.test$data, model = bst, features = "odor=none")
+
+
+#########################
+# Support Vector Machines
+#########################
+library(e1071)
+
+gauss2D <- mlbench.2dnormals(n=10000, cl=2, r=1)
+
+train <- list()
+train$x <- gauss2D$x[1:8000,]
+train$labels <- gauss2D$classes[1:8000]
+
+test <- list()
+test$x <- gauss2D$x[8001:10000,]
+test$labels <- gauss2D$classes[8001:10000]
+
+
+classifier <- svm(train$x, train$labels, type="C-classification", kernel='linear')
+y_pred <- predict(classifier, newdata = test$x) 
+
+plot(test$x, col=test$labels)
+cf <- coef(classifier)
+abline(-cf[1]/cf[3], -cf[2]/cf[3], col = "red")
