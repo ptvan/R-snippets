@@ -102,18 +102,27 @@ library(e1071)
 
 gauss2D <- mlbench.2dnormals(n=10000, cl=2, r=1)
 
-train <- list()
-train$x <- gauss2D$x[1:8000,]
-train$labels <- gauss2D$classes[1:8000]
+train <- data.frame(cbind(gauss2D$x[1:8000,], gauss2D$classes[1:8000]))
+colnames(train) <- c("X1","X2", "y")
 
-test <- list()
-test$x <- gauss2D$x[8001:10000,]
-test$labels <- gauss2D$classes[8001:10000]
+test <- data.frame(cbind(gauss2D$x[8001:10000,], gauss2D$classes[8001:10000]))
+colnames(test) <- c("X1","X2", "y")
 
+### using linear kernel
+cl_lin <- svm(y~., data=train,  type="C-classification", kernel='linear', scale=TRUE)
+pred_lin <- predict(cl_lin, newdata = test) 
 
-classifier <- svm(train$x, train$labels, type="C-classification", kernel='linear')
-y_pred <- predict(classifier, newdata = test$x) 
+plot(cl_lin, train)
+plot(cl_lin, test)
 
-plot(test$x, col=test$labels)
-cf <- coef(classifier)
-abline(-cf[1]/cf[3], -cf[2]/cf[3], col = "red")
+### using radial kernel
+cl_rbf <- svm(y~., data=train, type="C-classification", kernel='radial')
+pred_rbf <- predict(cl_rbf, newdata = test)
+
+# confusion matrix
+table(predicted = pred_rbf, actual = test$y)
+
+# misclassification rate
+mean(pred_rbf != test$y)*100
+
+plot(cl_rbf, train)
