@@ -62,6 +62,10 @@ points(gauss2D,col=cols)
 #######################################
 # Agglomerative hierarchical clustering
 #######################################
-ag <- agnes(HouseVotes84[,-1])
+ag <- agnes(Ionosphere[,c(3:34)])
 cl <- cutree(ag, 2)
 
+############################## 
+# Divisive analysis clustering
+############################## 
+di <- agnes(Ionosphere[,c(3:34)])
