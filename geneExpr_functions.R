@@ -375,7 +375,7 @@ categoryCompare <- function(dat, setsIndices, grp1name="group1", grp2name="group
         idxs[grp1idx] <- grp1name
         idxs[grp2idx] <- grp2name
         idx <- data.frame(cbind(cols,idxs))
-        d <- data.table(merge(melt(d), idx, by.x="Var2", by.y="cols"))
+        d <- data.table(merge(reshape2::melt(d), idx, by.x="Var2", by.y="cols"))
         setnames(d, c("Var1","Var2","value", "idxs")
                   , c("geneName", "inputColumn","expr","group"))
         
