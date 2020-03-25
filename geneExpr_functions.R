@@ -235,7 +235,7 @@ geneCompareWithWeights <- function (dat, camera2output, genesetidx, grp1name="gr
       idxs[grp1idx] <- grp1name
       idxs[grp2idx] <- grp2name
       idx <- data.frame(cbind(cols,idxs))
-      d <- data.table(merge(melt(dat), idx, by.x="Var2", by.y="cols"))
+      d <- data.table(merge(reshape2::melt(dat), idx, by.x="Var2", by.y="cols"))
       setnames(d, c("Var1","Var2","value", "idxs")
                , c("geneName", "inputColumn","expr","group"))
       
