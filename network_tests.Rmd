@@ -9,26 +9,40 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(igraph)
 library(visNetwork)
-
-
+library(ggraph)
+library(tidygraph)
 ```
 
 ### Tooltips for network nodes using `igraph` and `visNetwork`
 
 ```{r visNetwork ,echo=FALSE}
 set.seed(1)
+
+# create a sample Barabasi-Albert scale-free graph
 ba <-  sample_pa(n=100, power=1, m=1,  directed=F)
 V(ba)$color<-"yellow"
 V(ba)$label <- paste0("Node", 1:vcount(ba))
 V(ba)$label.cex <- rep(1.5, vcount(ba))
-ba <- toVisNetworkData(ba)
+bav <- toVisNetworkData(ba)
 
 # E(ba)$title <- paste0("Node", 1:ecount(ba))
 
-visNetwork(ba$nodes, ba$edges, main = "igraph object laid out with visNetwork") %>% 
+visNetwork(bav$nodes, bav$edges, main = "igraph object laid out with visNetwork") %>% 
   visEdges(color = "black") %>% 
   visIgraphLayout("layout.fruchterman.reingold") %>%
   # visLegend(width = 0.1, position = "right", main = "Group") %>%
   visOptions(width = "600", height = "600")
 ```  
+
+### Using ggraph and tidygraph
+
+```{r ggraph, echo=FALSE}
+bag <- as_tbl_graph(ba)
+
+ggraph(bag, layout = 'kk') + 
+    geom_edge_fan(aes(alpha = stat(index)), show.legend = FALSE) + 
+    geom_node_point(aes(color = color))
+```
+
+
   
