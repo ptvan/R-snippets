@@ -126,3 +126,19 @@ table(predicted = pred_rbf, actual = test$y)
 mean(pred_rbf != test$y)*100
 
 plot(cl_rbf, train)
+
+
+#################### 
+# Tree-based methods
+#################### 
+
+### using rpart and BreastCancer data
+library(mlbench)
+library(rpart)
+data(BreastCancer)
+
+fit <- rpart(Class ~ Cl.thickness + Cell.size + Cell.shape + Marg.adhesion, method="class", data=BreastCancer)
+printcp(fit)
+plotcp(fit)
+plot(fit, uniform=TRUE, main="breast cancer classification")
+text(fit, use.n=TRUE, all=TRUE, cex=.8)
