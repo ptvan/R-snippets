@@ -2,6 +2,7 @@
 # Naive Bayes
 ##########################
 ## using the naivebayes package
+library(naivebayes)
 library(tidyverse)
 library(ggplot2)
 
