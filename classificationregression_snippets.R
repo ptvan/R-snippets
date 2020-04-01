@@ -132,13 +132,31 @@ plot(cl_rbf, train)
 # Tree-based methods
 #################### 
 
-### using rpart and BreastCancer data
+### classifying BreastCancer data using rpart
 library(mlbench)
 library(rpart)
 data(BreastCancer)
 
-fit <- rpart(Class ~ Cl.thickness + Cell.size + Cell.shape + Marg.adhesion, method="class", data=BreastCancer)
+BreastCancer$Cell.size <- as.numeric(BreastCancer$Cell.size)
+BreastCancer$Cl.thickness <- as.numeric(BreastCancer$Cl.thickness)
+BreastCancer$Marg.adhesion <- as.numeric(BreastCancer$Marg.adhesion)
+BreastCancer$Cell.shape <- as.numeric(BreastCancer$Cell.shape)
+BreastCancer$Mitoses <- as.numeric(BreastCancer$Mitoses)
+BreastCancer$Epith.c.size <- as.numeric(BreastCancer$Epith.c.size)
+BreastCancer$Bl.cromatin <- as.numeric(BreastCancer$Bl.cromatin)
+BreastCancer$Normal.nucleoli <- as.numeric(BreastCancer$Normal.nucleoli)
+BreastCancer$Bare.nuclei <- as.numeric(BreastCancer$Bare.nuclei)
+
+fit <- rpart(Class ~ Cell.size + Cl.thickness + Marg.adhesion + Cell.shape + Mitoses + Epith.c.size + Bl.cromatin + Normal.nucleoli + Bare.nuclei, method="class", data=BreastCancer)
 printcp(fit)
 plotcp(fit)
 plot(fit, uniform=TRUE, main="breast cancer classification")
 text(fit, use.n=TRUE, all=TRUE, cex=.8)
+
+# pruning
+pfit<- prune(fit, cp=fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"])
+plot(pfit, uniform=TRUE,
+     main="breast cancer classification, pruned")
+text(pfit, use.n=TRUE, all=TRUE, cex=.8)
+
+### classifiying BreastCancer data using randomForest
