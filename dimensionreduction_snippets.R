@@ -68,6 +68,7 @@ library(kernlab)
 kpca_out <- kpca(dat, features=2) 
 rotated(kpca_out)
 
+
 ############
 # SAMMON
 ###########

@@ -163,7 +163,7 @@ plot(pfit, uniform=TRUE,
      main="breast cancer classification, pruned")
 text(pfit, use.n=TRUE, all=TRUE, cex=.8)
 
-### classifiying BreastCancer data using randomorest
+### classifying BreastCancer data using randomorest
 library(randomForest)
 rffit <- randomForest(Class ~ Cell.size + Cl.thickness + Marg.adhesion + Cell.shape + Mitoses + Epith.c.size + Bl.cromatin + Normal.nucleoli + Bare.nuclei, data=BreastCancer)
 importance(rffit)
