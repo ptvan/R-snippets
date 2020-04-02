@@ -1,5 +1,3 @@
-library(keras) # for autoencoders
-library(diffusionMap)
 library(tidyverse)
 library(magrittr)
 library(ggplot2)
@@ -76,4 +74,52 @@ library(MASS)
 sammon_out <- sammon(dist(dat[,-180]))
 plot(sammon_out$points, type="n")
 text(sammon_out$points, labels = as.character(1:nrow(dat[,-180])))
+
+
+################
+# AUTO-ENCODERS
+################
+library(keras) 
+x_train <- as.matrix(dat[,c(1:7)])
+
+# build neuralnet
+model <- keras_model_sequential()
+model %>%
+  layer_dense(units = 6, activation = "tanh", input_shape = ncol(x_train)) %>%
+  layer_dense(units = 3, activation = "tanh", name = "bottleneck") %>%
+  layer_dense(units = 6, activation = "tanh") %>%
+  layer_dense(units = ncol(x_train))
+
+model %>% compile(
+  loss = "mean_squared_error", 
+  optimizer = "adam"
+)
+
+summary(model)
+
+# train
+model %>% fit(
+  x = x_train, 
+  y = x_train, 
+  epochs = 2000,
+  verbose = 1
+)
+
+# evaluate neuralnet
+mse.ae2 <- evaluate(model, x_train, x_train)
+
+# extract bottleneck layer
+intermediate_layer_model <- keras_model(inputs = model$input, outputs = get_layer(model, "bottleneck")$output)
+intermediate_output <- predict(intermediate_layer_model, x_train)
+
+# plot principal components
+ggplot(data.frame(PC1 = intermediate_output[,1], PC2 = intermediate_output[,2])
+       , aes(x = PC1, y = PC2, col = dat$class)) + 
+        geom_point()
+
+
+#################
+# DIFFUSION MAPS
+#################
+library(diffusionMap)
 
