@@ -157,13 +157,13 @@ plotcp(fit)
 plot(fit, uniform=TRUE, main="breast cancer classification")
 text(fit, use.n=TRUE, all=TRUE, cex=.8)
 
-# pruning
+# prune the forest
 pfit<- prune(fit, cp=fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"])
 plot(pfit, uniform=TRUE,
      main="breast cancer classification, pruned")
 text(pfit, use.n=TRUE, all=TRUE, cex=.8)
 
-### classifying BreastCancer data using randomorest
+### classifying BreastCancer data using random forest
 library(randomForest)
 rffit <- randomForest(Class ~ Cell.size + Cl.thickness + Marg.adhesion + Cell.shape + Mitoses + Epith.c.size + Bl.cromatin + Normal.nucleoli + Bare.nuclei, data=BreastCancer)
 importance(rffit)
