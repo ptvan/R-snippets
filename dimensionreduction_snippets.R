@@ -82,12 +82,12 @@ text(sammon_out$points, labels = as.character(1:nrow(dat[,-180])))
 library(keras) 
 x_train <- as.matrix(dat[,c(1:7)])
 
-# build neuralnet
+# build neuralnet, 2 bottleneck units ~ 2D
 model <- keras_model_sequential()
 model %>%
-  layer_dense(units = 6, activation = "tanh", input_shape = ncol(x_train)) %>%
-  layer_dense(units = 3, activation = "tanh", name = "bottleneck") %>%
-  layer_dense(units = 6, activation = "tanh") %>%
+  layer_dense(units = 4, activation = "tanh", input_shape = ncol(x_train)) %>%
+  layer_dense(units = 2, activation = "tanh", name = "bottleneck") %>%
+  layer_dense(units = 4, activation = "tanh") %>%
   layer_dense(units = ncol(x_train))
 
 model %>% compile(
