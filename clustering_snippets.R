@@ -11,6 +11,14 @@ data <- truth$x
 km <- kmeans(data, centers = 2)
 
 
+#####################
+#  diffusion K-means
+####################
+# needs K, and run diffusionMap first
+dm <- diffuse(dist(data))
+dkm <- diffusionKmeans(dm, K=2)
+plot(data, col=dkm$part)
+
 #############
 # Mean Shift
 ############
