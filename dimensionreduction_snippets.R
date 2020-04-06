@@ -123,3 +123,7 @@ ggplot(data.frame(PC1 = intermediate_output[,1], PC2 = intermediate_output[,2])
 #################
 library(diffusionMap)
 
+# works on a `dist` object
+d <- dist(dat[,c(1:8)])
+dmap <- diffuse(D, eps.val=.1) 
+plot(dmap)
