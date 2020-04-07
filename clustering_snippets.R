@@ -4,6 +4,12 @@ library(mlbench) # provides data generation funcsions
 truth <- mlbench.spirals(500, 1, 0.025)
 data <- truth$x
 
+#################
+# Determining K
+#################
+library(NbClust)
+NbClust(data, method="ward.D")
+
 ###########
 #  K-means
 ###########
@@ -14,6 +20,7 @@ km <- kmeans(data, centers = 2)
 #####################
 #  diffusion K-means
 ####################
+library(diffusionMap)
 # needs K, and run diffusionMap first
 dm <- diffuse(dist(data))
 dkm <- diffusionKmeans(dm, K=2)
