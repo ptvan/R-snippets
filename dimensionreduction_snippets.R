@@ -127,3 +127,16 @@ library(diffusionMap)
 d <- dist(dat[,c(1:8)])
 dmap <- diffuse(D, eps.val=.1) 
 plot(dmap)
+
+
+####################### 
+# Self-organizing Maps
+####################### 
+library(kohonen)
+set.seed(100)
+grd <- somgrid(xdim=10, ydim=10, topo="hexagonal")
+sommodel <- som(data, grd)
+plot(sommodel, type="mapping", pchs=19)
+plot(sommodel, type="codes", pchs=19)
+plot(sommodel, type="changes")
+plot(sommodel, type="counts")

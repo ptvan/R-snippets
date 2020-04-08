@@ -1,4 +1,4 @@
-library(mlbench) # provides data generation funcsions
+library(mlbench) # provides data generation functions
 
 ## load 2D Swiss rolls from mlbench pkg, discard class info
 truth <- mlbench.spirals(500, 1, 0.025)
@@ -85,3 +85,4 @@ cl <- cutree(ag, 2)
 # Divisive analysis clustering
 ############################## 
 di <- agnes(Ionosphere[,c(3:34)])
+
