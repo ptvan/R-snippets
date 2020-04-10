@@ -5,27 +5,26 @@ library(ggtree)
 library(Biostrings)
 
 setwd("~/working/workflows/")
-dnaData <- readDNAStringSet("multiDNA.phy")
 
-# one sequence is 1 base short, which causes Hamming to fail
-# so we drop its sequence
-bad <- names(dnaData)[5]
-dnaData <- dnaData[-5]
+# read in the aligned sequences
+COVIDseqs <- readDNAStringSet("COVID19multi.phy")
+names(COVIDseqs) <- gsub("\\|","_", names(COVIDseqs))
+write.dna(COVIDseqs, "COVID19MSA.fa", "fasta")
 
-write.dna(dnaData, "out.fa", "fasta")
-tipseq_dist <- stringDist(dnaData, method = "hamming")
+# calculate Hamming distance
+tipseq_dist <- stringDist(COVIDseqs, method = "hamming")
 
-# also drop the corresponding tip from the tree
-mytree <- read.newick("multiDNA.phy.treefile")
-mytree <- drop.tip(mytree, mytree$tip.label[which(grepl("Thermoproteus", mytree$tip.label))])
+COVIDtree <- read.newick("COVID19multi.phy.treefile")
 
+# drop a duplicate tip from the tree
+# COVIDtree <- drop.tip(COVIDtree, COVIDtree$tip.label[which(grepl("MT042773", mytree$tip.label))])
 
-ggtree(mytree, layout="circular") +
-  geom_tiplab(size=3, color="blue")
-
-p <- ggtree(mytree, branch.length='none') + 
-  geom_tiplab() + xlim_tree(5.5) +
-  geom_cladelabel(1, "first clade") 
+#
+# ggtree(COVIDtree, layout="circular") +
+#   geom_tiplab(size=3, color="blue")
 
 # plot the tree along the multiple sequence alignment
-msaplot(p, "out.fa")
+p <- ggtree(COVIDtree, branch.length='none') + 
+  geom_tiplab() + xlim_tree(5.5) 
+
+msaplot(p, "COVID19MSA.fa")
