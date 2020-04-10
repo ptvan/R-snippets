@@ -62,5 +62,17 @@ ggtree(tidyTree, branch.length='none') +
 
 ## plot the tree along the multiple sequence alignment
 p <- ggtree(tidyTree, branch.length='none') + 
-  geom_tiplab() + xlim_tree(5.5) 
+  geom_tiplab() + 
+  xlim_tree(5.5) 
 msaplot(p, "COVID19MSA.fa", offset=10)
+
+## read the treetime output
+# time tree
+timed <- as.treedata(read.nexus("2020-04-10_treetime/timetree.nexus"))
+ggtree(timed) +
+  geom_tiplab() 
+
+# divergence tree
+div <- as.treedata(read.nexus("2020-04-10_treetime/divergence_tree.nexus"))
+ggtree(div) +
+  geom_tiplab() 
