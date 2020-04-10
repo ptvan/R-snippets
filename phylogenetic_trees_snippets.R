@@ -15,6 +15,12 @@ colnames(meta) <- c("genBank", "date", "location")
 names(COVIDseqs) <- gsub("\\|","_", names(COVIDseqs))
 meta$label <- names(COVIDseqs)
 
+# write out the dates for treetime
+dates <- meta[,c("label","date")]
+colnames(dates) <- c("accession","date")
+dates$date <- gsub("_", "-", dates$date)
+write.csv(dates, file="COVID19dates.csv", row.names = FALSE, quote=FALSE)
+
 # write the aligned sequences out as a FASTA
 write.dna(COVIDseqs, "COVID19MSA.fa", "fasta")
 
