@@ -23,9 +23,9 @@ mytree <- drop.tip(mytree, mytree$tip.label[which(grepl("Thermoproteus", mytree$
 ggtree(mytree, layout="circular") +
   geom_tiplab(size=3, color="blue")
 
-
 p <- ggtree(mytree, branch.length='none') + 
   geom_tiplab() + xlim_tree(5.5) +
   geom_cladelabel(1, "first clade") 
 
+# plot the tree along the multiple sequence alignment
 msaplot(p, "out.fa")
