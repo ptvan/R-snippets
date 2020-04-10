@@ -35,8 +35,9 @@ phylo <- read.newick("COVID19multi.phy.treefile")
 # rerooted <- root(phylo)
 # all.equal(rerooted, phylo)
 
-## tidytree implements a S4 'treedata' object, allowing metadata
-# tidyTree <- full_join(as.treedata(phylo), meta, by="label")
+## tidytree implements a S4 'treedata' object
+# since it is internally a tibble, we just full_join to merge metadata 
+tidyTree <- full_join(as.treedata(phylo), meta, by="label")
 
 ## plotting using ggtree
 # ggtree(tidyTree, layout="circular") +
