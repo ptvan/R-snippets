@@ -33,6 +33,9 @@ phylo <- read.newick("COVID19multi.phy.treefile")
 ## drop a duplicate tip from the tree
 # phylo <- drop.tip(phylo, phylo$tip.label[which(grepl("MT042773", mytree$tip.label))])
 
+## write the Newick tree out for treetime 
+write.tree(phylo, file="COVID19multi.nwk")
+
 ## phylo is a S3 'phylo' objects, which has some useful methods
 # plot(phylo)
 # plot(phylo, type="unrooted")
