@@ -14,6 +14,7 @@ km <- with(veteran, Surv(time, status))
 
 km_fit <- survfit(Surv(time, status) ~ 1, data=veteran)
 summary(km_fit, times = c(1,30,60,90*(1:10)))
+autoplot(km_fit)
 
 # stratifying subjects by age & rerunning the model
 vet <- mutate(veteran, AG = ifelse((age < 60), "LT60", "OV60"),
@@ -21,11 +22,16 @@ vet <- mutate(veteran, AG = ifelse((age < 60), "LT60", "OV60"),
               trt = factor(trt,labels=c("standard","test")),
               prior = factor(prior,labels=c("N0","Yes")))
 km_AG_fit <- survfit(Surv(time, status) ~ AG, data=vet)
+autoplot(km_AG_fit)
 
 # running the G-rho Flemming-Harrington test on the stratified data
 survdiff(Surv(time, status) ~ AG, data=vet)
 
 # calculating concordance
+# `For continuous covariates concordance is equivalent to Kendall's tau, 
+# and for logistic regression is is equivalent to the area under the ROC curve. 
+# A value of 1 signifies perfect agreement, .6-.7 is a common result for survival data, 
+# .5 is an agreement that is no better than chance, and .3-.4 is the performance of some stock market analysts.`
 # NOTE: only handles a single covariate
 survConcordance(status ~ karno
                 , data = vet)
