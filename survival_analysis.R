@@ -45,7 +45,7 @@ aa_fit <- aareg(Surv(time, status) ~ trt + celltype +
 autoplot(aa_fit)
 
 
-#### Random-Forest survival using ranger on age-split data
+#### Random-Forest survival using ranger on age-stratified data
 r_fit <- ranger(Surv(time, status) ~ trt + celltype + 
                   karno + diagtime + age + prior,
                 data = vet,
@@ -53,6 +53,15 @@ r_fit <- ranger(Surv(time, status) ~ trt + celltype +
                 importance = "permutation",
                 splitrule = "extratrees",
                 verbose = TRUE)
+
+# getting the variable importance
+vi <- data.frame(sort(round(r_fit$variable.importance, 4), decreasing = TRUE))
+names(vi) <- "importance"
+
+# getting Harrell's c-index, basically 
+# n_concordance_pairs / (n_conconrdent_pairs + n_discordant_pairs)
+# more details: https://statisticaloddsandends.wordpress.com/2019/10/26/what-is-harrells-c-index/
+cat("Prediction Error = 1 - Harrell's c-index = ", r_fit$prediction.error)
 
 # Average the survival models
 death_times <- r_fit$unique.death.times 
