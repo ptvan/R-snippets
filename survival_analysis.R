@@ -21,14 +21,22 @@ vet <- mutate(veteran, AG = ifelse((age < 60), "LT60", "OV60"),
 km_AG_fit <- survfit(Surv(time, status) ~ AG, data=vet)
 
 #### Cox Proportional Hazard model
-# fitting all covars
 # NOTE: Cox assumes that covariates do not vary with time
+# fitting all covars
 cox <- coxph(Surv(time, status) ~ trt + celltype + 
                karno + diagtime + age + prior 
                , data = vet)
 summary(cox)
 cox_fit <- survfit(cox)
 autoplot(cox_fit)
+
+#### Aalen's additive regression model
+# time-varying covariates are handled
+# NOTE: aareg() performs the fit so we don't need to call survfit()
+aa_fit <- aareg(Surv(time, status) ~ trt + celltype +
+                 karno + diagtime + age + prior 
+                , data = vet)
+autoplot(aa_fit)
 
 
 #### Random-Forest survival using ranger on age-split data
