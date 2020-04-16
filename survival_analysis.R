@@ -25,6 +25,10 @@ km_AG_fit <- survfit(Surv(time, status) ~ AG, data=vet)
 # running the G-rho Flemming-Harrington test on the stratified data
 survdiff(Surv(time, status) ~ AG, data=vet)
 
+# calculating concordance
+# NOTE: only handles a single covariate
+survConcordance(status ~ karno
+                , data = vet)
 
 #### Cox Proportional Hazard model
 # NOTE: Cox assumes that covariates do not vary with time
@@ -35,6 +39,7 @@ cox <- coxph(Surv(time, status) ~ trt + celltype +
 summary(cox)
 cox_fit <- survfit(cox)
 autoplot(cox_fit)
+
 
 #### Aalen's additive regression model
 # time-varying covariates are handled
