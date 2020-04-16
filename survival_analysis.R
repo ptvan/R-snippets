@@ -3,6 +3,8 @@ library(ggfortify)
 library(ranger)
 library(dplyr)
 
+# credit: https://rviews.rstudio.com/2017/09/25/survival-analysis-with-r/
+
 # note: score = Karnofsky performance score
 data(veteran)
 head(veteran)
