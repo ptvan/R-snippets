@@ -17,3 +17,7 @@ dat.fm$out <- factor(rep(c("+", "-", "+", "-"), k), levels = c("+", "-"))
 dat.fm$freq <- with(dat.bcg, c(rbind(tpos, tneg, cpos,cneg)))
 # NOTE: this throws an error with metafor 2.4 ?!
 escalc(out ~ grp | study, weights = freq, data = dat.fm, measure = "RR")
+
+# fitting the model
+res <- rma(ai = tpos, bi = tneg, ci = cpos, di = cneg, data = dat,  measure = "RR")
+confint(res)
