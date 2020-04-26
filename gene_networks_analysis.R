@@ -1,8 +1,9 @@
-# Make igraph from adjacency matrix
 library(WGCNA)
 library(igraph)
-library(ggraph2)
+library(ggraph)
 library(ggnetwork)
+library(plyr)
+library(KEGGREST)
 
 ######################
 # GENERATE DUMMY DATA
@@ -27,18 +28,18 @@ rownames(counts) <- genes
 # create ExpressionSet
 dat <- ExpressionSet(assayData=as.matrix(counts))
 
-######################
-# CREATE ADJACENCY MATRIX
-######################
-
+#######################################
+# CREATE NETWORK FROM ADJACENCY MATRIX
+######################################
 adjMat  <- adjacency( t(dat[which(rownames(dat)%in%geneList$gene),]))
 diag(adjMat) <- 0
 g <- graph_from_adjacency_matrix(adjMat, weighted=T, mode=c("undirected"))
 
-# see what the correlation looks like for our genes and filter
-# hist(edge_attr(g, "weight"))
+# see the distribution of correlation values and filter
+hist(edge_attr(g, "weight"))
+g2 <- subgraph.edges(g, E(g)[weight > 0.1])
 
-g2 <- subgraph.edges(g, E(g)[weight>0.1])
+# attach logFC values to nodes
 V(g2)$logFC <- geneList[match(vertex_attr(g2, "name"), geneList$gene),]$logFC
 V(g2)$geneName <- V(g2)$name
 
@@ -65,11 +66,11 @@ pcit(corMat)
 # filter unconnected vertices
 net <- induced_subgraph(net, v=which(igraph::degree(g=net, v=V(net))>1))
 
-############################
-# CREATE NETWORK FROM "SEED" GENES
-############################
+#############################################
+# EXPAND A NETWORK FROM MANUALLY-SEEDED GENES
+#############################################
 
-# create a network by expanding some "seed" genes with their KEGG-annotated pathway co-members
+# create a network by expanding some "seed" genes with their KEGG pathway co-members
 myGenes <- c("TLR1"
                ,"TLR2"
                ,"TLR4"
@@ -80,19 +81,23 @@ myGenes <- c("TLR1"
 # hsa2path <- keggLink("hsa", "pathway")
 # path2hsa <- keggLink("pathway", "hsa")
 
+# map genenames to Entrez
 gn2entrez <- ldply(mget(myGenes, envir=org.Hs.egSYMBOL2EG, ifnotfound=NA), data.frame)
 colnames(gn2entrez) <- c("geneName", "entrezNum")
 gn2entrez <- gn2entrez[complete.cases(gn2entrez),]
 
-entrez2kegg <- ldply(mget(gn2entrez$entrezNum, envir=org.Hs.egPATH, ifnotfound=NA), data.frame)
+# map Entrez to KEGG pathways
+entrez2kegg <- ldply(mget(as.character(gn2entrez$entrezNum), envir=org.Hs.egPATH, ifnotfound=NA), data.frame)
 colnames(entrez2kegg) <- c("entrezNum", "keggPathway")
 myPathways <- paste0("hsa", as.character(unique(entrez2kegg$keggPathway)))
 
+# query KEGG for members of the matched pathways
 keggMatches <- NULL
-
 for (i in 1:length(myPathways)){
   s <- keggGet(myPathways[i])[[1]]$GENE
   s <- s[grep(";", s)]
   s <- gsub("; .+$", "\\1", s)
   keggMatches <- c(keggMatches, s)
 }
+
+
