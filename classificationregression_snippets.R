@@ -180,3 +180,14 @@ library(pls)
 # when ncomp is not specified, the maximum number is used
 plsfit <- plsr(cmedv ~ lon + lat + crim + indus + nox + rm + age + dis + ptratio , data=BostonHousing2, validation="LOO")
 
+# plot Root Mean Squared Error of Prediction vs. no. of components
+plot(RMSEP(plsfit), legendpos="topright")
+
+# plot cross-validated prediction vs. observed values
+plot(plsfit, ncomp = 2, asp = 1, line = TRUE)
+
+# plot loadings
+plot(plsfit, "loadings", comps=1:2, legendpos="topright")
+
+# extract explained variances
+explvar(plsfit)
