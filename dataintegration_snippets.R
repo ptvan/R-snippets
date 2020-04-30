@@ -65,6 +65,11 @@ plotVar(MyResult.diablo
         ,legend=TRUE, pch=c(16,16,1)
         )
 
+# relevance network
+network(MyResult.diablo, blocks = c(1,2,3),
+        color.node = c('darkorchid', 'brown1', 'lightgreen'),
+        cutoff = 0.6, save = 'png', name.save = 'DIABLOnetwork')
+
 # circos of correlation between data types
 circosPlot(MyResult.diablo
            , line=TRUE
@@ -82,3 +87,7 @@ plotLoadings(MyResult.diablo
              , comp = 1, contrib = "max")
 
 
+
+############################
+# using the mixOmics package
+############################
