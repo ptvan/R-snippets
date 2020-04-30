@@ -89,5 +89,8 @@ plotLoadings(MyResult.diablo
 
 
 ############################
-# using the mixOmics package
+# using parallelized glm
 ############################
+library(glmnet)
+library(doParallel)
+library(foreach)
