@@ -167,3 +167,16 @@ text(pfit, use.n=TRUE, all=TRUE, cex=.8)
 library(randomForest)
 rffit <- randomForest(Class ~ Cell.size + Cl.thickness + Marg.adhesion + Cell.shape + Mitoses + Epith.c.size + Bl.cromatin + Normal.nucleoli + Bare.nuclei, data=BreastCancer)
 importance(rffit)
+
+
+
+#########################
+# Partial Least Squares
+#########################
+library(mlbench)
+library(pls)
+
+### regression so response must be continuous, corrected median value from BostonHousing2 in this case
+# when ncomp is not specified, the maximum number is used
+plsfit <- plsr(cmedv ~ lon + lat + crim + indus + nox + rm + age + dis + ptratio , data=BostonHousing2, validation="LOO")
+
