@@ -93,14 +93,15 @@ plotLoadings(MyResult.diablo
 # using parallelized glm
 ############################
 # many thanks to Chad Young for inspiring the code below
-
 library(glmnet)
 library(doParallel)
 library(foreach)
 
+# parallelize
 numCores <- detectCores()
 registerDoParallel(numCores)
 
+# simulate a multi-omics dataset
 N <- 50
 D1 <- 500
 D2 <- 500
@@ -109,17 +110,17 @@ genes <- matrix(rnorm(N*D1),nrow=D1, ncol=N)
 proteins <- matrix(rnorm(N*D2),nrow=D2, ncol=N)
 colnames(genes) <- paste0("sample_",1:N)
 colnames(proteins) <- paste0("sample_",1:N)
-
 rownames(genes) <- paste0("orf",1:D1,"gene")
 rownames(proteins) <- paste0("orf",1:D2,"protein")
-
 allData <- rbind(genes, proteins)
-
 set.seed(100)
 m <- as.data.frame(cbind(colnames(genes), sample(c(rep("HIV", N/2), rep("healthy", N/2)))))
 colnames(m) <- c("sample","status")
+
+# covariate
 m$status <- as.factor(m$status)
 
+# single gene/protein as predictor
 results <- foreach (i = 1:nrow(allData),
                     .combine = bind_rows,
                     .packages = c("glmnet", "dplyr", "tidyr")) %dopar% {
