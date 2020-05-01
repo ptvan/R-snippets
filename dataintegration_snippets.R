@@ -9,9 +9,10 @@ N <- 100
 D1 <- 250
 D2 <- 500
 
-view1 = matrix(rnorm(N*D1),nrow=D1, ncol=N)
-view2 = matrix(rnorm(N*D2),nrow=D2, ncol=N)
-colnames(view1) <- colnames(view2) <- paste0("sample_",1:N)
+view1 <- matrix(rnorm(N*D1),nrow=D1, ncol=N)
+view2 <- matrix(rnorm(N*D2),nrow=D2, ncol=N)
+colnames(view1) <- paste0("sample_",1:N)
+colnames(view2) <- paste0("sample_",1:N)
 rownames(view1) <- paste0("feature",1:D1,"_view",1)
 rownames(view2) <- paste0("feature",1:D2,"_view",2)
 
@@ -91,6 +92,49 @@ plotLoadings(MyResult.diablo
 ############################
 # using parallelized glm
 ############################
+# many thanks to Chad Young for inspiring the code below
+
 library(glmnet)
 library(doParallel)
 library(foreach)
+
+numCores <- detectCores()
+registerDoParallel(numCores)
+
+N <- 50
+D1 <- 500
+D2 <- 500
+
+genes <- matrix(rnorm(N*D1),nrow=D1, ncol=N)
+proteins <- matrix(rnorm(N*D2),nrow=D2, ncol=N)
+colnames(genes) <- paste0("sample_",1:N)
+colnames(proteins) <- paste0("sample_",1:N)
+
+rownames(genes) <- paste0("orf",1:D1,"gene")
+rownames(proteins) <- paste0("orf",1:D2,"protein")
+
+allData <- rbind(genes, proteins)
+
+set.seed(100)
+m <- as.data.frame(cbind(colnames(genes), sample(c(rep("HIV", N/2), rep("healthy", N/2)))))
+colnames(m) <- c("sample","status")
+m$status <- as.factor(m$status)
+
+results <- foreach (i = 1:nrow(allData),
+                    .combine = bind_rows,
+                    .packages = c("glmnet", "dplyr", "tidyr")) %dopar% {
+              orf <- rownames(allData)[i]
+              fit <- glm(allData[i,] ~ status, data=m)
+              coefs <- coef(summary(fit))
+              coefs <- coefs %>%
+                as_tibble() %>%
+                mutate(predictor = orf,
+                       var = rownames(coefs),
+                       aic = summary(fit)$aic,
+                       bic = BIC(fit)) %>%
+                filter(var!="(Intercept)") %>%
+                rename(estimate = Estimate,
+                       se = `Std. Error`,
+                       tval = `t value`,
+                       pval = `Pr(>|t|)`)
+}
