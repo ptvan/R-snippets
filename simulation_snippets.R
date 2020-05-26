@@ -19,3 +19,7 @@ add_resource("nurse", 1) %>%
 add_resource("doctor", 2) %>%
 add_resource("administration", 1) %>%
 add_generator("patient", patient, function() rnorm(1, 10, 2))
+
+env %>%
+  run(80) %>%
+  now()
