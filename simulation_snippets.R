@@ -1,4 +1,6 @@
 library(simmer)
+library(parallel)
+
 set.seed(999)
 
 env <- simmer("mySim")
@@ -23,3 +25,20 @@ add_generator("patient", patient, function() rnorm(1, 10, 2))
 env %>%
   run(80) %>%
   now()
+
+
+envs <- mclapply(1:100, function(i) {
+  simmer("myParallelSim") %>%
+    add_resource("nurse", 1) %>%
+    add_resource("doctor", 2) %>%
+    add_resource("administration", 1) %>%
+    add_generator("patient", patient, function() rnorm(1, 10, 2)) %>%
+    run(80) %>%
+    wrap()
+})
+
+envs[[1]] %>% get_n_generated("patient")
+
+envs %>%
+  get_mon_resources() %>%
+  head()
