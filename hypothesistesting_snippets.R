@@ -16,3 +16,6 @@ summary(anovaOut)
 # Pearson's Chi-Squared
 tbl <- table(survey$Smoke, survey$Exer) 
 chisq.test(tbl) 
+
+# Mann-Whitney U test
+wilcox.test(dat1, dat2)
