@@ -1,4 +1,5 @@
 library(MASS)
+library(tseries)
 
 dat1 <- runif(1000)
 dat2 <- runif(1000)
@@ -22,3 +23,6 @@ chisq.test(tbl)
 
 # Mann-Whitney U test
 wilcox.test(dat1, dat2)
+
+# Augmented Dickey-Fuller test 
+adf.test(dat1)
