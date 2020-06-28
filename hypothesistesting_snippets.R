@@ -11,6 +11,9 @@ shapiro.test(dat1)
 # Student's t-test
 t.test(dat1, dat2)
 
+# Kendall's Tau
+cor.test(dat1, dat2, method="kendall")
+
 # ANOVA
 df <- reshape2::melt(cbind(dat1, dat2, dat3))[,c("Var2","value")]
 colnames(df) <- c("group","value")
