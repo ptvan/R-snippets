@@ -1,5 +1,6 @@
 library(MASS)
 library(tseries)
+library(nortest)
 
 dat1 <- runif(1000)
 dat2 <- runif(1000)
@@ -7,6 +8,9 @@ dat3 <- runif(1000)
 
 # Shapiro-Wilk test for normality
 shapiro.test(dat1)
+
+# Anderson-Darling test for normality
+ad.test(dat1)
 
 # Student's t-test
 t.test(dat1, dat2)
@@ -27,5 +31,5 @@ chisq.test(tbl)
 # Mann-Whitney U test
 wilcox.test(dat1, dat2)
 
-# Augmented Dickey-Fuller test 
+# Augmented Dickey-Fuller test for time-series autoregressiveness
 adf.test(dat1)
