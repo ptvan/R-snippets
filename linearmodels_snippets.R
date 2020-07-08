@@ -25,3 +25,7 @@ zipoiss <- glmmadmb(NCalls~(FoodTreatment+ArrivalTime)*SexParent+offset(logBrood
                     ,data=Owls
                     ,zeroInflation=TRUE
                     ,family="poisson")
+
+hurdle <- glmmadmb(NCalls~(FoodTreatment+ArrivalTime)*SexParent+BroodSize+(1|Nest)
+                         ,data=subset(Owls,NCalls>0)
+                         ,family="truncnbinom1")
