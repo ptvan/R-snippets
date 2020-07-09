@@ -1,6 +1,7 @@
 library(glmm)
 library(lme4)
 library(glmmADMB)
+library(brms)
 
 data(Dyestuff)
 # using restricted maximum likelihood
@@ -26,6 +27,12 @@ zipoiss <- glmmadmb(NCalls~(FoodTreatment+ArrivalTime)*SexParent+offset(logBrood
                     ,zeroInflation=TRUE
                     ,family="poisson")
 
+# hurdle model
 hurdle <- glmmadmb(NCalls~(FoodTreatment+ArrivalTime)*SexParent+BroodSize+(1|Nest)
                          ,data=subset(Owls,NCalls>0)
                          ,family="truncnbinom1")
+
+# using BRMS
+bf1 <- brm(bf(NCalls ~ ArrivalTime), 
+            data = Owls, family = gaussian())
+
