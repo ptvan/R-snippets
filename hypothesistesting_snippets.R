@@ -31,5 +31,8 @@ chisq.test(tbl)
 # Mann-Whitney U test
 wilcox.test(dat1, dat2)
 
+# test for proportions
+prop.test(cbind(dat1, dat2), alternative="two.sided")
+
 # Augmented Dickey-Fuller test for time-series autoregressiveness
 adf.test(dat1)
