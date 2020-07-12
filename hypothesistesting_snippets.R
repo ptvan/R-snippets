@@ -13,7 +13,7 @@ shapiro.test(dat1)
 ad.test(dat1)
 
 ### Student's t-test
-t.test(dat1, dat2)
+t.test(dat1, dat2, alternative = "two.sided")
 
 ### Kendall's Tau
 cor.test(dat1, dat2, method="kendall")
