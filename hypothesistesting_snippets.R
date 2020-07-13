@@ -33,7 +33,7 @@ chisq.test(tbl2x2, correct=TRUE)
 
 
 ### Mann-Whitney U test
-wilcox.test(dat1, dat2)
+wilcox.test(dat1, dat2, alternative = "two.sided")
 
 ### test for proportions
 prop.test(cbind(dat1, dat2), alternative="two.sided")
