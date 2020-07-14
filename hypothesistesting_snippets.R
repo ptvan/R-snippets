@@ -39,4 +39,4 @@ wilcox.test(dat1, dat2, alternative = "two.sided")
 prop.test(cbind(dat1, dat2), alternative="two.sided")
 
 ### Augmented Dickey-Fuller test for time-series autoregressiveness
-adf.test(dat1)
+adf.test(dat1, alternative = "explosive")
