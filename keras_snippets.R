@@ -1,4 +1,7 @@
 library(keras)
+library(tensorflow)
+use_implementation("tensorflow")
+tfe_enable_eager_execution(device_policy = "silent")
 
 ### MNIST classification
 # load data
