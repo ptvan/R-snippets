@@ -155,3 +155,22 @@ discriminator <-
 # model creation
 generator <- generator()
 discriminator <- discriminator()
+
+generator$call = tf$contrib$eager$defun(generator$call)
+discriminator$call = tf$contrib$eager$defun(discriminator$call)
+
+discriminator_loss <- function(real_output, generated_output) {
+  real_loss <- tf$losses$sigmoid_cross_entropy(
+    multi_class_labels = k_ones_like(real_output),
+    logits = real_output)
+  generated_loss <- tf$losses$sigmoid_cross_entropy(
+    multi_class_labels = k_zeros_like(generated_output),
+    logits = generated_output)
+  real_loss + generated_loss
+}
+
+generator_loss <- function(generated_output) {
+  tf$losses$sigmoid_cross_entropy(
+    tf$ones_like(generated_output),
+    generated_output)
+}
