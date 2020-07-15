@@ -151,3 +151,7 @@ discriminator <-
       }
     })
   }
+
+# model creation
+generator <- generator()
+discriminator <- discriminator()
