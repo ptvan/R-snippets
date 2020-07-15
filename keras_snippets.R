@@ -174,3 +174,6 @@ generator_loss <- function(generated_output) {
     tf$ones_like(generated_output),
     generated_output)
 }
+
+discriminator_optimizer <- tf$train$AdamOptimizer(1e-4)
+generator_optimizer <- tf$train$AdamOptimizer(1e-4)
