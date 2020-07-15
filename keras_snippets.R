@@ -249,3 +249,7 @@ generate_and_save_images <- function(model, epoch, test_input) {
   }
   dev.off()
 }
+
+# actually run the generation
+num_epochs <- 150
+train(train_dataset, num_epochs, noise_dim)
