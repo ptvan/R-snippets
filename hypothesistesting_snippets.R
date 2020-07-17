@@ -14,7 +14,7 @@ shapiro.test(dat1)
 ad.test(dat1)
 
 ### Student's t-test
-t.test(dat1, dat2, alternative = "two.sided")
+t.test(dat1, dat2, alternative = "two.sided", var.equal = TRUE)
 
 ### Kendall's Tau
 cor.test(dat1, dat2, method="kendall")
@@ -25,7 +25,9 @@ colnames(df) <- c("group","value")
 anovaOut <- aov(value ~ group, data=df)
 summary(anovaOut)
 
-Anova(df, type="II", test="Wald")
+mod <- lm(conformity ~ fcategory*partner.status, data=Moore,
+          contrasts=list(fcategory=contr.sum, partner.status=contr.sum))
+Anova(mod, type="II", test.statistic ="Wald")
 
 ### Pearson's Chi-Squared
 tbl <- table(survey$Smoke, survey$Exer) 
