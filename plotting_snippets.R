@@ -2,7 +2,8 @@ library(viridis)
 library(ComplexHeatmap)
 library(cowplot)
 library(ggridges)
-library(ggsurvplot)
+library(survminer)
+library(ggpubr)
 
 # viridis provides colorblindness-safe palettes 
 
@@ -13,3 +14,7 @@ library(ggsurvplot)
 # ggridges (formerly ggjoy) plots ridgelines
 
 
+# ggsurvplot from survminer
+
+
+# ggviolin from ggpubr
