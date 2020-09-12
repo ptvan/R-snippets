@@ -2,6 +2,7 @@ library(viridis)
 library(ComplexHeatmap)
 library(cowplot)
 library(ggridges)
+library(ggsurvplot)
 
 # viridis provides colorblindness-safe palettes 
 
