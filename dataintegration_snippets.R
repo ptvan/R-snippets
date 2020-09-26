@@ -139,3 +139,9 @@ results <- foreach (i = 1:nrow(allData),
                        tval = `t value`,
                        pval = `Pr(>|t|)`)
 }
+
+
+###################################
+# using the iClusterPlus package
+###################################
+library(iClusterPlus)
