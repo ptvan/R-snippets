@@ -153,3 +153,10 @@ library(iClusterPlus)
 # using mocluster package
 ###################################
 library(mogsa)
+
+
+
+#########################
+# using omicade4 package
+#########################
+library(omicade4)
