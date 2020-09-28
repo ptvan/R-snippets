@@ -170,7 +170,26 @@ gbm.cn <- gbm.cn[order(rownames(gbm.cn)),]
 all(rownames(gbm.cn) == rownames(gbm.exp))
 all(rownames(gbm.cn) == rownames(gbm.mut))
 
+# run the integrated clustering with K=2
+set.seed(123)
+fit.single <- iClusterPlus(dt1=gbm.mut
+                           , dt2=gbm.cn
+                           , dt3=gbm.exp
+                           , type=c("binomial","gaussian","gaussian")
+                           , lambda=c(0.04,0.61,0.90)
+                           , K=2
+                           , maxiter=10)
 
+for(k in 1:5){
+  +
+    cv2.fit = tune.iClusterPlus(cpus=12,dt1=gbm.mut2,dt2=gbm.cn,dt3=gbm.exp,
+                                +
+                                  type=c("binomial","gaussian","gaussian"),K=k,n.lambda=185,
+                                +
+                                  scale.lambda=c(0.05,1,1),maxiter=20)
+    +
+      save(cv2.fit, file=paste("cv2.fit.k",k,".Rdata",sep=""))
+    + }
 ###################################
 # using mocluster package
 ###################################
