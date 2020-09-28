@@ -181,9 +181,10 @@ fit.single <- iClusterPlus(dt1=gbm.mut
                            , maxiter=10)
 
 # more realistically, we would choose K using tune.iclusterPlus
+# in this case K=1 to K=5
 for(k in 1:5){
     cv2.fit <- tune.iClusterPlus(cpus=8
-                                 , dt1=gbm.mut2
+                                 , dt1=gbm.mut
                                  , dt2=gbm.cn
                                  , dt3=gbm.exp
                                  , type=c("binomial","gaussian","gaussian")
@@ -192,6 +193,24 @@ for(k in 1:5){
                                  , scale.lambda=c(0.05,1,1)
                                  , maxiter=20)
       save(cv2.fit, file=paste("cv2.fit.k",k,".Rdata",sep=""))
+}
+
+output2 <- list()
+files <- grep("cv2.fit",dir())
+
+for(i in 1:length(files)){
+  load(dir()[files[i]])
+  output2[[i]]=cv2.fit
+}
+
+nLambda <- nrow(output2[[1]]$lambda)
+nK <- length(output2)
+BIC <- getBIC(output2)
+devR <- getDevR(output2)
+minBICid <- apply(BIC,2,which.min)
+devRatMinBIC <- rep(NA,nK)
+for(i in 1:nK){
+  devRatMinBIC[i] <- devR[minBICid[i],i]
 }
 
 ###################################
