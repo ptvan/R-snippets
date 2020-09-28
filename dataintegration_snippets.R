@@ -145,10 +145,30 @@ results <- foreach (i = 1:nrow(allData),
 # using the iClusterPlus package
 ###################################
 library(iClusterPlus)
+library(GenomicRanges)
 
 # load bundled data, which includes expression, mutation and copy number
+data(variation.hg18.v10.nov.2010)
 data(gbm)
 
+# calculate mutation rates then filter the boolean mutation matrix
+mut.rate <- apply(gbm.mut,2,mean)
+gbm.mut <- gbm.mut[,which(mut.rate > 0.02)]
+
+# remove redundant copy number regions
+gbm.cn <- CNregions(seg=gbm.seg
+                    , epsilon=0
+                    , adaptive=FALSE
+                    , rmCNV=TRUE
+                    , cnv=variation.hg18.v10.nov.2010[,3:5]
+                    , frac.overlap=0.5
+                    , rmSmallseg=TRUE
+                    , nProbes=5)
+
+# sort the datasets and make sure all samples are in same order
+gbm.cn <- gbm.cn[order(rownames(gbm.cn)),]
+all(rownames(gbm.cn) == rownames(gbm.exp))
+all(rownames(gbm.cn) == rownames(gbm.mut))
 
 
 ###################################
