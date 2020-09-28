@@ -213,6 +213,20 @@ for(i in 1:nK){
   devRatMinBIC[i] <- devR[minBICid[i],i]
 }
 
+# plot %variance explained vs. K to select K using elbow
+plot(1:(nK+1),c(0,devRatMinBIC)
+     , type="b"
+     , xlab="Number of clusters (K+1)"
+     , ylab="%Explained Variation")
+
+clusters <- getClusters(output2)
+rownames(clusters) <- rownames(gbm.exp)
+colnames(clusters) <- paste("K=",2:(length(output2)+1),sep="")
+#write.table(clusters, file="clusterMembership.txt",sep='\t',quote=F)
+k=2
+best.cluster <- clusters[,k]
+best.fit <- output2[[k]]$fit[[which.min(BIC[,k])]]
+
 ###################################
 # using mocluster package
 ###################################
