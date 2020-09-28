@@ -146,6 +146,8 @@ results <- foreach (i = 1:nrow(allData),
 ###################################
 library(iClusterPlus)
 
+# load bundled data, which includes expression, mutation and copy number
+data(gbm)
 
 
 
