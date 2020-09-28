@@ -180,16 +180,20 @@ fit.single <- iClusterPlus(dt1=gbm.mut
                            , K=2
                            , maxiter=10)
 
+# more realistically, we would choose K using tune.iclusterPlus
 for(k in 1:5){
-  +
-    cv2.fit = tune.iClusterPlus(cpus=12,dt1=gbm.mut2,dt2=gbm.cn,dt3=gbm.exp,
-                                +
-                                  type=c("binomial","gaussian","gaussian"),K=k,n.lambda=185,
-                                +
-                                  scale.lambda=c(0.05,1,1),maxiter=20)
-    +
+    cv2.fit <- tune.iClusterPlus(cpus=8
+                                 , dt1=gbm.mut2
+                                 , dt2=gbm.cn
+                                 , dt3=gbm.exp
+                                 , type=c("binomial","gaussian","gaussian")
+                                 , K=k
+                                 , n.lambda=185
+                                 , scale.lambda=c(0.05,1,1)
+                                 , maxiter=20)
       save(cv2.fit, file=paste("cv2.fit.k",k,".Rdata",sep=""))
-    + }
+}
+
 ###################################
 # using mocluster package
 ###################################
