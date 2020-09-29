@@ -146,6 +146,7 @@ results <- foreach (i = 1:nrow(allData),
 ###################################
 library(iClusterPlus)
 library(GenomicRanges)
+library(gplots)
 
 # load bundled data, which includes expression, mutation and copy number
 data(variation.hg18.v10.nov.2010)
@@ -183,7 +184,7 @@ fit.single <- iClusterPlus(dt1=gbm.mut
 # more realistically, we would choose K using tune.iclusterPlus
 # in this case K=1 to K=3
 date()
-for(k in 1:3){
+for(k in 4:6){
     cv2.fit <- tune.iClusterPlus(cpus=8
                                  , dt1=gbm.mut
                                  , dt2=gbm.cn
@@ -221,6 +222,7 @@ plot(1:(nK+1),c(0,devRatMinBIC)
      , xlab="Number of clusters (K+1)"
      , ylab="%Explained Variation")
 
+# choose clusters from the best K
 clusters <- getClusters(output2)
 rownames(clusters) <- rownames(gbm.exp)
 colnames(clusters) <- paste("K=",2:(length(output2)+1),sep="")
@@ -228,6 +230,40 @@ colnames(clusters) <- paste("K=",2:(length(output2)+1),sep="")
 k=2
 best.cluster <- clusters[,k]
 best.fit <- output2[[k]]$fit[[which.min(BIC[,k])]]
+
+# extract the features
+features <- alist()
+features[[1]] <- colnames(gbm.mut)
+features[[2]] <- colnames(gbm.cn)
+features[[3]] <- colnames(gbm.exp)
+sigfeatures <- alist()
+for(i in 1:3){
+  rowsum <- apply(abs(best.fit$beta[[i]]),1, sum)
+  upper <- quantile(rowsum,prob=0.75)
+  sigfeatures[[i]] <- (features[[i]])[which(rowsum > upper)] 
+}
+names(sigfeatures) <- c("mutation","copy number","expression")
+
+# plot a heatmap
+col.scheme = alist()
+col.scheme[[1]] <- bw.col
+col.scheme[[2]] <- bluered(256)
+col.scheme[[3]] <- bluered(256)
+
+chr <- unlist(strsplit(colnames(gbm.cn),"\\."))
+chr <- chr[seq(1,length(chr),by=2)]
+chr <- gsub("chr","",chr)
+chr <- as.numeric(chr)
+
+plotHeatmap(fit=best.fit
+            , datasets=list(gbm.mut , gbm.cn, gbm.exp)
+            , type=c("binomial","gaussian","gaussian")
+            # , col.scheme = col.scheme
+            , row.order = c(F,F,T)
+            , chr = chr
+            , plot.chr = c(F,T,F)
+            , sparse=c(T,F,T)
+            , cap=c(F,T,F))
 
 ###################################
 # using mocluster package
