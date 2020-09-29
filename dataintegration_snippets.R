@@ -181,19 +181,21 @@ fit.single <- iClusterPlus(dt1=gbm.mut
                            , maxiter=10)
 
 # more realistically, we would choose K using tune.iclusterPlus
-# in this case K=1 to K=5
-for(k in 1:5){
+# in this case K=1 to K=3
+date()
+for(k in 1:3){
     cv2.fit <- tune.iClusterPlus(cpus=8
                                  , dt1=gbm.mut
                                  , dt2=gbm.cn
                                  , dt3=gbm.exp
                                  , type=c("binomial","gaussian","gaussian")
                                  , K=k
-                                 , n.lambda=185
+                                 , n.lambda=101
                                  , scale.lambda=c(0.05,1,1)
                                  , maxiter=20)
       save(cv2.fit, file=paste("cv2.fit.k",k,".Rdata",sep=""))
 }
+date()
 
 output2 <- list()
 files <- grep("cv2.fit",dir())
