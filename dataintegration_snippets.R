@@ -1,3 +1,8 @@
+############################################
+# generating multiple linked omics datasets
+############################################
+library(InterSIM)
+
 #########################
 # using the MOFA package
 #########################
