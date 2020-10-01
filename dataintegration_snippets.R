@@ -3,6 +3,29 @@
 ############################################
 library(InterSIM)
 
+# proportion of samples in the clusters, length = K
+prop <- c(0.20,0.30,0.27,0.23) 
+
+# cluster mean shift, can be set for each dataset
+effect <- 5
+
+sim.data <- InterSIM(n.sample=500
+                     , cluster.sample.prop = prop
+                     , delta.methyl=effect
+                     , delta.expr=effect
+                     , delta.protein=effect
+                     , p.DMP=0.2
+                     , p.DEG=NULL
+                     , p.DEP=NULL
+                     , sigma.methyl=NULL
+                     , sigma.expr=NULL
+                     , sigma.protein=NULL
+                     , cor.methyl.expr=NULL
+                     , cor.expr.protein=NULL
+                     , do.plot=FALSE
+                     , sample.cluster=TRUE
+                     , feature.cluster=TRUE)
+
 #########################
 # using the MOFA package
 #########################
