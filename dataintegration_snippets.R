@@ -355,7 +355,18 @@ scr <- moaScore(moa)
 plot(scr[, 1:2], col=colcode, pch=20)
 legend("topright", legend = unique(tumorType), col=unique(colcode), pch=20)
 
-#########################
-# using omicade4 package
-#########################
-library(omicade4)
+# load annotation matrices and check that all names match
+data(NCI60_4array_supdata)
+identical(names(NCI60_4arrays), names(NCI60_4array_supdata))
+dataColNames <- lapply(NCI60_4arrays, colnames)
+supColNames <- lapply(NCI60_4arrays, colnames)
+identical(dataColNames, supColNames)
+
+# run GSEA
+mgsa1 <- mogsa(x = NCI60_4arrays
+               , sup=NCI60_4array_supdata
+               , nf=3
+               , proc.row = "center_ssq1"
+               , w.data = "inertia"
+               , statis = TRUE)
+scores <- getmgsa(mgsa1, "score")
