@@ -22,9 +22,10 @@ sim.data <- InterSIM(n.sample=500
                      , sigma.protein=NULL
                      , cor.methyl.expr=NULL
                      , cor.expr.protein=NULL
-                     , do.plot=FALSE
+                     , do.plot=TRUE
                      , sample.cluster=TRUE
                      , feature.cluster=TRUE)
+names(sim.data)
 
 #########################
 # using the MOFA package
