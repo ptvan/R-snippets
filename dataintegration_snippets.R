@@ -27,6 +27,8 @@ sim.data <- InterSIM(n.sample=500
                      , feature.cluster=TRUE)
 names(sim.data)
 
+lapply(sim.data, dim)
+
 #########################
 # using the MOFA package
 #########################
