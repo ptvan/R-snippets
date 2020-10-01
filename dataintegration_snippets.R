@@ -301,7 +301,32 @@ plotHeatmap(fit=best.fit
 ###################################
 library(mogsa)
 
+# 4 dataframes of microarray data from 4 different platforms
+# each dataframe column is a cell line
+data(NCI60_4arrays)
+lapply(NCI60_4arrays, colnames)
 
+# generating colors for tumor types for plotting later
+tumorType <- sapply(strsplit(colnames(NCI60_4arrays$agilent), split="\\."), "[", 1)
+colcode <- as.factor(tumorType)levels(colcode) <- c("red", "green", "blue", "cyan", "orange","gray25", "brown", "gray75", "pink")colcode <- as.character(colcode)
+
+# run the clustering
+# "globalScore" method = consensus PCA
+# "blockScore" method = generalized CCA
+# "blockLoading" method = multiple co-inertia analysis (MCIA)
+
+moa <- mbpca(NCI60_4arrays
+             , ncomp = 10, k = "all"
+             , method = "globalScore"
+             , option = "lambda1"
+             , center=TRUE
+             , scale=FALSE
+             , moa = TRUE
+             , svd.solver = "fast"
+             , maxiter = 1000)
+
+# plot variance associated with each latent factor
+plot(moa, value="eig", type=2)
 
 #########################
 # using omicade4 package
