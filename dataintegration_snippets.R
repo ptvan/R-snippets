@@ -315,8 +315,10 @@ colcode <- as.factor(tumorType)levels(colcode) <- c("red", "green", "blue", "cya
 # "blockScore" method = generalized CCA
 # "blockLoading" method = multiple co-inertia analysis (MCIA)
 
+# run with 10 components, keeping all variables 
 moa <- mbpca(NCI60_4arrays
-             , ncomp = 10, k = "all"
+             , ncomp = 10
+             , k = "all"
              , method = "globalScore"
              , option = "lambda1"
              , center=TRUE
@@ -327,6 +329,22 @@ moa <- mbpca(NCI60_4arrays
 
 # plot variance associated with each latent factor
 plot(moa, value="eig", type=2)
+
+# bootstrap the result to estimate K, output a plot which we can use shoulder method 
+r <- bootMbpca(moa, mc.cores = 4, B=20, replace = FALSE, resample = "sample")
+
+# rerun with 3 components, keeping 10% of variables ("k" param)
+moa <- mbpca(NCI60_4arrays
+             , ncomp = 3
+             , k = 0.1
+             , method = "globalScore"
+             , option = "lambda1"
+             , center=TRUE
+             , scale=FALSE
+             , moa = TRUE
+             , svd.solver = "fast"
+             , maxiter = 1000)
+
 
 #########################
 # using omicade4 package
