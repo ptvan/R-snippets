@@ -69,7 +69,7 @@ MOFAobject.trained <- runMOFA(MOFAobject, outfile)
 
 
 ############################
-# using the mixOmics package
+# USING MixOmics
 ############################
 library(mixOmics)
 
@@ -98,9 +98,13 @@ plotVar(MyResult.diablo
         )
 
 # relevance network
-network(MyResult.diablo, blocks = c(1,2,3),
-        color.node = c('darkorchid', 'brown1', 'lightgreen'),
-        cutoff = 0.6, save = 'png', name.save = 'DIABLOnetwork')
+network(MyResult.diablo
+        , blocks = c(1,2,3)
+        , color.node = c('darkorchid', 'brown1', 'lightgreen')
+        , cutoff = 0.6
+        # , save = 'png'
+        # , name.save = 'DIABLOnetwork'
+        )
 
 # circos of correlation between data types
 circosPlot(MyResult.diablo
@@ -121,7 +125,7 @@ plotLoadings(MyResult.diablo
 
 
 ############################
-# using parallelized glm
+# USING PARALLELIZED glm
 ############################
 # many thanks to Chad Young for inspiring the code below
 library(glmnet)
@@ -173,7 +177,7 @@ results <- foreach (i = 1:nrow(allData),
 
 
 ###################################
-# using the iClusterPlus package
+# USING iClusterPlus
 ###################################
 library(iClusterPlus)
 library(GenomicRanges)
@@ -213,9 +217,9 @@ fit.single <- iClusterPlus(dt1=gbm.mut
                            , maxiter=10)
 
 # more realistically, we would choose K using tune.iclusterPlus
-# in this case K=1 to K=3
+# in this case K=1 to K=6, which would take hours on a personal computer
 date()
-for(k in 4:6){
+for(k in 1:6){
     cv2.fit <- tune.iClusterPlus(cpus=8
                                  , dt1=gbm.mut
                                  , dt2=gbm.cn
@@ -297,7 +301,7 @@ plotHeatmap(fit=best.fit
             , cap=c(F,T,F))
 
 ###################################
-# using mocluster package
+# USING MOGSA
 ###################################
 library(mogsa)
 
