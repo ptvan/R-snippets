@@ -308,7 +308,9 @@ lapply(NCI60_4arrays, colnames)
 
 # generating colors for tumor types for plotting later
 tumorType <- sapply(strsplit(colnames(NCI60_4arrays$agilent), split="\\."), "[", 1)
-colcode <- as.factor(tumorType)levels(colcode) <- c("red", "green", "blue", "cyan", "orange","gray25", "brown", "gray75", "pink")colcode <- as.character(colcode)
+colcode <- as.factor(tumorType)
+levels(colcode) <- c("red", "green", "blue", "cyan", "orange","gray25", "brown", "gray75", "pink")
+colcode <- as.character(colcode)
 
 # run the clustering
 # "globalScore" method = consensus PCA
@@ -333,6 +335,9 @@ plot(moa, value="eig", type=2)
 # bootstrap the result to estimate K, output a plot which we can use shoulder method 
 r <- bootMbpca(moa, mc.cores = 4, B=20, replace = FALSE, resample = "sample")
 
+# alternatively, use gap statistic to get optimal K
+gap <- moGap(moa, K.max = 12, cluster = "hcl")
+
 # rerun with 3 components, keeping 10% of variables ("k" param)
 moa <- mbpca(NCI60_4arrays
              , ncomp = 3
@@ -345,6 +350,10 @@ moa <- mbpca(NCI60_4arrays
              , svd.solver = "fast"
              , maxiter = 1000)
 
+# extract scores
+scr <- moaScore(moa)
+plot(scr[, 1:2], col=colcode, pch=20)
+legend("topright", legend = unique(tumorType), col=unique(colcode), pch=20)
 
 #########################
 # using omicade4 package
