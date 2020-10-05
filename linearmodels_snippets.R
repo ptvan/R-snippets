@@ -2,6 +2,10 @@ library(glmm)
 library(lme4)
 library(glmmADMB)
 library(brms)
+library(MASS) # for Box-Cox transformation
+
+# Box-Cox transformation
+boxcox(lm(dist~speed,data=cars),lambda=seq(0,1,by=.1))
 
 data(Dyestuff)
 # using restricted maximum likelihood
