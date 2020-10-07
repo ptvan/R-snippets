@@ -3,15 +3,22 @@ library(lme4)
 library(glmmADMB)
 library(brms)
 library(MASS) # for Box-Cox transformation
+library(car) # for VIF
 
 # Box-Cox transformation
 boxcox(lm(dist~speed,data=cars),lambda=seq(0,1,by=.1))
 
-## model diagnostics
+############################
+# MODEL DIAGNOSTICS
+##########################
 # fitted vs. residuals plot
 lmod <- lm(mpg ~ disp + hp + wt + drat, data=mtcars)
 plot(fitted(lmod), residuals(lmod), xlab="Fitted", ylab="Residuals")
 abline(h=0)
+
+# evaluate multi-collinearity by looking at variance inflation factors
+vif(lmod)
+sqrt(vif(lmod)) > 2
 
 data(Dyestuff)
 # using restricted maximum likelihood
