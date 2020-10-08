@@ -3,7 +3,7 @@ library(lme4)
 library(glmmADMB)
 library(brms)
 library(MASS) # for Box-Cox transformation
-library(car) # for VIF
+library(car) # for VIF, Durbin-Watson test
 
 # Box-Cox transformation
 boxcox(lm(dist~speed,data=cars),lambda=seq(0,1,by=.1))
@@ -19,6 +19,9 @@ abline(h=0)
 # evaluate multi-collinearity by looking at variance inflation factors
 vif(lmod)
 sqrt(vif(lmod)) > 2
+
+# evaluate independence of errors
+durbinWatsonTest(lmod)
 
 data(Dyestuff)
 # using restricted maximum likelihood
