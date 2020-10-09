@@ -15,6 +15,7 @@ boxcox(lm(dist~speed,data=cars),lambda=seq(0,1,by=.1))
 lmod <- lm(mpg ~ disp + hp + wt + drat, data=mtcars)
 plot(fitted(lmod), residuals(lmod), xlab="Fitted", ylab="Residuals")
 abline(h=0)
+qqPlot(lmod)
 
 # evaluate multi-collinearity by looking at variance inflation factors
 vif(lmod)
