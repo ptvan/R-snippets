@@ -4,6 +4,7 @@ library(cowplot)
 library(ggridges)
 library(survminer)
 library(ggpubr)
+library(venn)
 
 # viridis provides colorblindness-safe palettes 
 
@@ -18,3 +19,5 @@ library(ggpubr)
 
 
 # ggviolin from ggpubr
+
+# venn supports up to 7-set Venn diagrams
