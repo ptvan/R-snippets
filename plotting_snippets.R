@@ -12,7 +12,7 @@ ggplot(mtcars, aes(wt, mpg)) +
   scale_color_viridis(discrete=TRUE) +
   theme_bw()
 
-# ggpubr provides p-values for comparing groups
+# ggpubr provides p-values for comparing groups with ggboxplot
 ggboxplot(ToothGrowth, 
           x="dose", 
           y="len", 
@@ -21,7 +21,9 @@ ggboxplot(ToothGrowth,
           add="jitter"
           ) +
     stat_compare_means(comparisons= list(c("0.5","1"), c("1","2"), c("0.5","2"))) 
-    
+
+# ggviolin from ggpubr
+
 
 # ComplexHeatmap allows partitioning and more robust annotation
 
@@ -31,8 +33,6 @@ ggboxplot(ToothGrowth,
 
 # ggsurvplot from survminer
 
-
-# ggviolin from ggpubr
 
 
 # venn supports up to 7-set Venn diagrams
