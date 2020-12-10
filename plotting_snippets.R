@@ -22,7 +22,17 @@ ggboxplot(ToothGrowth,
           ) +
     stat_compare_means(comparisons= list(c("0.5","1"), c("1","2"), c("0.5","2"))) 
 
-# ggviolin from ggpubr
+# ggviolin from ggpubr, can show significant pvals with */**/***
+ggviolin(ToothGrowth, 
+         x = "dose", 
+         y = "len", 
+         fill = "dose",
+         add = "boxplot"
+         , add.params = list(fill = "white")
+         ) +
+stat_compare_means(comparisons=list(c("0.5","1"), c("1","2"), c("0.5","2"))
+                   ,label="p.signif"
+                   ) 
 
 
 # ComplexHeatmap allows partitioning and more robust annotation
