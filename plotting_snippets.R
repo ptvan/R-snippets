@@ -41,8 +41,18 @@ stat_compare_means(comparisons=list(c("0.5","1"), c("1","2"), c("0.5","2"))
 # ggridges (formerly ggjoy) plots ridgelines
 
 
-# ggsurvplot from survminer
+# ggsurvplot from survminer, add confidence intervals and p-vals
 
+fit <- survfit(Surv(time, status) ~ sex, data = lung)
+
+ggsurvplot(fit,  
+           size = 1,  
+           linetype = "strata", 
+           break.time.by = 250, 
+           palette = c("#E7B800", "#2E9FDF"), 
+           conf.int = TRUE,
+           pval = TRUE 
+)
 
 
 # venn supports up to 7-set Venn diagrams
