@@ -41,8 +41,7 @@ stat_compare_means(comparisons=list(c("0.5","1"), c("1","2"), c("0.5","2"))
 # ggridges (formerly ggjoy) plots ridgelines
 
 
-# ggsurvplot from survminer, add confidence intervals and p-vals
-
+# ggsurvplot from survminer, support risk tables, confidence intervals and p-vals
 fit <- survfit(Surv(time, status) ~ sex, data = lung)
 
 ggsurvplot(fit,  
@@ -51,7 +50,8 @@ ggsurvplot(fit,
            break.time.by = 250, 
            palette = c("#E7B800", "#2E9FDF"), 
            conf.int = TRUE,
-           pval = TRUE 
+           pval = TRUE,
+           risk.table = TRUE
 )
 
 
