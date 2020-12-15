@@ -48,9 +48,15 @@ mat <- cbind(rbind(matrix(rnorm(nr1*nc1, mean = 1,   sd = 0.5), nr = nr1),
                   matrix(rnorm(nr2*nc3, mean = 0.5, sd = 0.5), nr = nr2),
                   matrix(rnorm(nr3*nc3, mean = 1,   sd = 0.5), nr = nr3))
 )
+mat <- mat[sample(nr, nr), sample(nc, nc)]
+rownames(mat) <- paste0("row", seq_len(nr))
+colnames(mat) <- paste0("column", seq_len(nc))
+
+Heatmap(mat, name = "mat", row_km = 2)
 
 # ggridges (formerly ggjoy) plots ridgelines
-
+ggplot(iris, aes(x = Sepal.Length, y = Species)) + 
+  geom_density_ridges(scale = 0.9)
 
 # ggsurvplot from survminer, support risk tables, confidence intervals and p-vals
 fit <- survfit(Surv(time, status) ~ sex, data = lung)
