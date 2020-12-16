@@ -73,3 +73,4 @@ ggsurvplot(fit,
 
 
 # venn supports up to 7-set Venn diagrams
+venn("A, E, D", snames = "A, B, C, D, E", zcolor = "red, blue, green, yellow, purple")
