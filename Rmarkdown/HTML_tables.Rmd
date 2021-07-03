@@ -1,0 +1,62 @@
+---
+title: "HTML tables"
+author: "Phu T. Van"
+date: "7/3/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(kableExtra)
+library(dplyr)
+library(formattable)
+```
+
+## kableExtra: conditionally highlight rows/columns
+We must get row/column indices since can't specify row_spec/column_spec by name
+
+Some features like `scroll_box` and `hover` are HTML-only
+
+```{r kableExtra_conditional_formatting}
+row_indices <- mtcars %>% 
+  mutate(idx = row_number()) %>% 
+  filter(mpg > 30) %>% 
+  pull(idx)
+
+mtcars %>%
+  kbl() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+  column_spec(1, bold = T, border_right = T) %>%
+  row_spec(row_indices, background="yellow") %>%
+  kable_paper() %>%
+  scroll_box(width = "700px", height = "200px") 
+```
+
+## kableExtra: inline plotting
+
+```{r kableExtra_inline_plotting}
+mpg_list <- split(mtcars$mpg, mtcars$cyl)
+inline_plot <- data.frame(cyl = c(4, 6, 8), 
+                          mpg_box = "", 
+                          mpg_hist = "",
+                          mpg_line = "",
+                          mpg_points = "",
+                          mpg_poly = "")
+inline_plot %>%
+  kbl(booktabs = TRUE) %>%
+  kable_paper(full_width = TRUE) %>%
+  column_spec(2, image = spec_boxplot(mpg_list)) %>%
+  column_spec(3, image = spec_hist(mpg_list)) %>%
+  column_spec(4, image = spec_plot(mpg_list, type = "l")) %>%
+  column_spec(5, image = spec_plot(mpg_list, type = "p")) %>%
+  column_spec(6, image = spec_plot(mpg_list, polymin = 5))
+```
+
+## formattable: conditional formatting
+
+```{r formattable_conditional_formatting}
+formattable(mtcars, list(
+  mpg = color_tile("transparent", "lightpink"),
+  cyl = color_bar("lightgreen"),
+  disp = color_bar("lightblue"))) 
+```

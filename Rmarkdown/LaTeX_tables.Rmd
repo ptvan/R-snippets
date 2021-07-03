@@ -1,0 +1,50 @@
+---
+title: "LaTex tables"
+author: "Phu T. Van"
+date: "7/3/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(kableExtra)
+library(dplyr)
+```
+
+## kableExtra: grouped columns
+Most (all?) `kableExtra` features that work for HTML output also work for LaTeX/PDF output
+
+```{r kableExtra_grouped_columns}
+kbl(mtcars) %>%
+  kable_paper() %>%
+  add_header_above(c(" " = 1, "Group 1" = 2, "Group 2" = 2, "Group 3" = 7))
+```
+
+## kableExtra: grouped rows
+This adds header rows for subgroups, indenting the subgroup members themselves
+
+```{r kableExtra_grouped_rows}
+kbl(mtcars[1:10, 1:6], caption = "Group Rows") %>%
+  kable_paper("striped", full_width = F) %>%
+  pack_rows("Group 1", 4, 7) %>%
+  pack_rows("Group 2", 8, 10)
+```
+
+## kableExtra: indenting rows & footnotes
+This simply indents certain rows without adding rows
+
+Footnotes have full formatting options
+  
+```{r kableExtra_indenting_rows}
+kbl(mtcars) %>%
+  kable_paper("striped", full_width = F) %>%
+  add_indent(c(1, 3, 5)) %>%
+  footnote(general = "Here is a general comments of the table. ",
+           number = c("Footnote 1; ", "Footnote 2; "),
+           alphabet = c("Footnote A; ", "Footnote B; "),
+           symbol = c("Footnote Symbol 1; ", "Footnote Symbol 2"),
+           general_title = "General: ", number_title = "Type I: ",
+           alphabet_title = "Type II: ", symbol_title = "Type III: ",
+           footnote_as_chunk = T, title_format = c("italic", "underline")
+           )
+```
