@@ -1,4 +1,5 @@
 ## Matrix operations
+# make a covariance matrix
 V <- matrix(c(10,-5,10,-5,20,10,0,30), nrow=3))
 # trace
 sum(diag(V))
