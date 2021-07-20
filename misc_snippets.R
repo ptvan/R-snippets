@@ -1,13 +1,24 @@
-## Matrix operations
-# make a covariance matrix
+### Matrix operations
+
+# trace of a covariance matrix
 V <- matrix(c(10,-5,10,-5,20,10,0,30), nrow=3))
-# trace
 sum(diag(V))
+
+W <- matrix(c(5,-10,10,-5,10,20,30,0), nrow=3))
+
+# matrix multiplication
+W %*% V
+
+# outer product
+W %o% V
+
+# W'B
+crossprod(W,V)
+
 # Eigen vectors & values
 # eigen(V)$vectors[,i] is weights of principal component i
 # eigen(V)$values[i]/trace is %variation explained by principal component i
 eigen(V)
-
 
 # toggle scientific notation off for session
 options(scipen=999)
