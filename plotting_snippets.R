@@ -47,10 +47,10 @@ mat <- cbind(rbind(matrix(rnorm(nr1*nc1, mean = 1,   sd = 0.5), nr = nr1),
 mat <- mat[sample(nr, nr), sample(nc, nc)]
 rownames(mat) <- paste0("row", seq_len(nr))
 colnames(mat) <- paste0("column", seq_len(nc))
-g <- Heatmap(mat, name = "mat", row_km = 2)
+g <- Heatmap(mat, name = "mat", row_km = 2, column_names_rot = 0, row_names_side = "left")
 
 # adjust page margins (bottom, left, top, right)
-draw(g, unit(c(1.0, 0.5, 0.5, 1.0), "in" ))
+draw(g, unit(c(1.0, 0.5, 0.5, 1.0), "in" ) , heatmap_legend_side = "left")
 
 
 #### ggridges (formerly ggjoy) plots ridgelines
