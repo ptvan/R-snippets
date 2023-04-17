@@ -1,8 +1,11 @@
 library(ggplot2)
 library(ggrepel)
 library(maps)
-usa <- map_data("usa")
+library(usmap)
+library(spatialEpi)
 
+
+usa <- map_data("usa")
 
 places <- data.frame(
   long = c(-79.995888, -122.306417, -122.306445),
@@ -21,5 +24,4 @@ continental_US +
   geom_text_repel(data = places, aes(x = long, y = lat, label=names), color = "red", size = 3
                   )
 
-library(usmap)
 plot_usmap("states", exclude=c("AK","HI"), labels = T)
