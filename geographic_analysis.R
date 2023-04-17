@@ -2,8 +2,10 @@ library(ggplot2)
 library(ggrepel)
 library(maps)
 library(usmap)
-library(spatialEpi)
+library(SpatialEpi)
 
+# basic plotting of locations 
+plot_usmap("states", exclude = c("AK","HI"), labels = T)
 
 usa <- map_data("usa")
 
@@ -15,13 +17,17 @@ places <- data.frame(
 )  
 
 continental_US <- ggplot() +
-  geom_polygon(data = usa, aes(x=long, y = lat, group = group), fill=NA, color="gray") +
+  geom_polygon(data = usa, aes(x = long, y = lat, group = group), fill = NA, color = "gray") +
   coord_fixed(1.3) +
   theme_void()
 
 continental_US + 
   geom_point(data = places, aes(x = long, y = lat), color = "red", size = 3, alpha = 0.2) +
-  geom_text_repel(data = places, aes(x = long, y = lat, label=names), color = "red", size = 3
-                  )
+  geom_text_repel(data = places, aes(x = long, y = lat, label=names), color = "red", size = 3) +
+  coord_fixed(1.3) +
+  theme_void()
 
-plot_usmap("states", exclude=c("AK","HI"), labels = T)
+# load in nutria2007 sighting data and convert to 
+nutria_sightings <- read.csv("~/working/nutria2007/nutria_obs.csv")
+nutria_centroids <- latlong2grid(nutria_sightings[, 1:2])
+
