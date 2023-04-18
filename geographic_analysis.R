@@ -2,7 +2,11 @@ library(ggplot2)
 library(ggrepel)
 library(maps)
 library(usmap)
+library(tidycensus)
 library(SpatialEpi)
+
+census_api_key("MYAPIKEYGOESHERE", install = TRUE)
+options(tigris_use_cache = TRUE)
 
 # basic plotting of locations 
 plot_usmap("states", exclude = c("AK","HI"), labels = T)
@@ -31,3 +35,19 @@ continental_US +
 nutria_sightings <- read.csv("~/working/nutria2007/nutria_obs.csv")
 nutria_centroids <- latlong2grid(nutria_sightings[, 1:2])
 
+# load in King County from US Census ACS 2020 data
+king_county <- get_acs(
+  state = "WA",
+  county = "King",
+  geography = "tract",
+  variables = "B19013_001",
+  geometry = TRUE,
+  year = 2020
+)
+
+plot(king_county["estimate"])
+
+king_county %>%
+  ggplot(aes(fill = estimate)) + 
+  geom_sf(color = NA) + 
+  scale_fill_viridis_c(option = "magma") 
