@@ -51,3 +51,4 @@ king_county %>%
   ggplot(aes(fill = estimate)) + 
   geom_sf(color = NA) + 
   scale_fill_viridis_c(option = "magma") 
+
