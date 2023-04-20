@@ -2,10 +2,14 @@ library(ggplot2)
 library(ggrepel)
 library(maps)
 library(usmap)
+library(tmap)
 library(tidycensus)
 library(SpatialEpi)
+library(osmdata)
+library(ggmap)
+library(sf)
 
-census_api_key("MYAPIKEYGOESHERE", install = TRUE)
+census_api_key("MYCENSUSAPIKEYGOESHERE", install = TRUE)
 options(tigris_use_cache = TRUE)
 
 # basic plotting of locations 
@@ -31,9 +35,6 @@ continental_US +
   coord_fixed(1.3) +
   theme_void()
 
-# load in nutria2007 sighting data and convert to 
-nutria_sightings <- read.csv("~/working/nutria2007/nutria_obs.csv")
-nutria_centroids <- latlong2grid(nutria_sightings[, 1:2])
 
 # load in King County from US Census ACS 2020 data
 king_county <- get_acs(
@@ -52,3 +53,74 @@ king_county %>%
   geom_sf(color = NA) + 
   scale_fill_viridis_c(option = "magma") 
 
+# load in nutria2007 sighting data and convert to Simple Features
+# using WGS84 Coordinate Reference System
+nutria_sightings <- read.csv("~/working/nutria2007/nutria_obs.csv")
+nutria_centroids <- latlong2grid(nutria_sightings[, 1:2])
+nutria_sf <- st_as_sf(nutria_sightings, 
+                      coords = c("longitude", "latitude"),
+                      crs = st_crs(4326)
+)
+
+tmap_mode("view")
+tm_shape(nutria_sf) + tm_dots("type")
+
+tmap_mode("plot")
+nutria_map <- tm_shape(nutria_sf) + tm_dots("type")
+tmap_save(nutria_map, "nutria_map.png", width=900, height=600)
+
+
+WA_counties <- map_data('county', 'washington') %>% 
+  select(lon = long, lat, group, id = subregion)
+
+ggplot(WA_counties, aes(lon, lat)) + 
+  geom_polygon(fill = "white", colour = "grey50") + 
+  coord_quickmap()
+
+ggplot(nutria_sf) + 
+  geom_sf() + 
+  coord_sf()
+
+Seattle_bb <- getbb("Seattle") 
+Shoreline_bb <- getbb("Shoreline") 
+KC_bb <- getbb("King County")
+
+Seattle_roads <- Seattle_bb %>%
+  opq() %>%
+  add_osm_feature(key = "highway", value = c("tertiary", "residential")) %>%
+  osmdata_sf() 
+
+Shoreline_roads <- Shoreline_bb %>%
+  opq() %>%
+  add_osm_feature(key = "highway", value = c("tertiary", "residential")) %>%
+  osmdata_sf() 
+
+Seattle_highways <- Seattle_bb %>%
+  opq() %>%
+  add_osm_feature(key = "highway", value = c("motorway", "primary", "secondary")) %>%
+  osmdata_sf() 
+
+KC_roads <- KC_bb %>%
+  opq() %>%
+  add_osm_feature(key = "highway", value = c("tertiary", "residential")) %>%
+  osmdata_sf() 
+
+KC_highways <- KC_bb %>%
+  opq() %>%
+  add_osm_feature(key = "highway", value = c("motorway", "primary", "secondary")) %>%
+  osmdata_sf() 
+  
+ggplot() +
+  geom_sf(data = Seattle_roads$osm_lines,
+          inherit.aes = FALSE,
+          color = "blue",
+          size = 0.2) +
+  geom_sf(data = Shoreline_roads$osm_lines,
+          inherit.aes = FALSE,
+          color = "green",  
+          size = 0.1) +
+  geom_sf(data = nutria_sf,
+          color = "red",
+          size = 0.5
+          ) +
+  theme_void()
