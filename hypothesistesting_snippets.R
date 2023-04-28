@@ -19,13 +19,13 @@ ad.test(dat1)
 ### Student's t-test
 t.test(dat1, dat2, alternative = "two.sided", var.equal = TRUE)
 
-### Kruskal-Wallis test
+## Kruskal-Wallis test
 kruskal.test(dat1, dat2)
 
-### Kendall's Tau
+## Kendall's Tau
 cor.test(dat1, dat2, method="kendall")
 
-### ANOVA
+## ANOVA
 anovaOut <- aov(value ~ group, data=df)
 summary(anovaOut)
 
@@ -36,10 +36,10 @@ Anova(mod, type="II", test.statistic ="Wald")
 ### Pearson's Chi-Squared
 tbl <- table(survey$Smoke, survey$Exer) 
 chisq.test(tbl) 
+
 # correction for 2x2 contingency table, ignored if input > 2x2
 tbl2x2 <- tbl[c(1:2),c(1:2)]
 chisq.test(tbl2x2, correct=TRUE)
-
 
 ### Mann-Whitney U test
 wilcox.test(dat1, dat2, alternative = "two.sided")
@@ -47,5 +47,24 @@ wilcox.test(dat1, dat2, alternative = "two.sided")
 ### test for proportions
 prop.test(cbind(dat1, dat2), alternative="two.sided")
 
+# using counts with multiple testing correction
+counts_tbl <- data.frame(totals = c(76413234, 86464210, 79836106) , cases = c(36, 19, 22) )
+rownames(counts_tbl) <- c("A", "B", "C")
+
+A_vs_B <- prop.test(counts_tbl$cases[c(1,2)],
+          counts_tbl$totals[c(1,2)])
+
+B_vs_C <- prop.test(counts_tbl$cases[c(2,3)],
+                    counts_tbl$totals[c(2,3)])
+
+A_vs_C <- prop.test(counts_tbl$cases[c(1,3)],
+                    counts_tbl$totals[c(1,3)])
+
+pvals <- c(A_vs_B$p.value, B_vs_C$p.value, A_vs_C$p.value)
+names(pvals) <- c("A_vs_B","B_vs_C","A_vs_C")
+
+pvals_adjusted <- p.adjust(pvals, method="fdr")
+
 ### Augmented Dickey-Fuller test for time-series autoregressiveness
 adf.test(dat1, alternative = "explosive")
+
