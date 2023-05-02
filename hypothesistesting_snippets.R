@@ -65,6 +65,14 @@ names(pvals) <- c("A_vs_B","B_vs_C","A_vs_C")
 
 pvals_adjusted <- p.adjust(pvals, method="fdr")
 
+# using Fisher's exact test
+# NOTE: prop.test is generally preferred since p-vals will be very similar,
+# and fisher.test is limited by requiring that the product of the rows be < 2^31-1
+# however, if any cases < 10, fisher.test can be more accurate
+
+A_vs_B_fisher <- fisher.test(counts_tbl[c(1,2),])
+
+
 ### Augmented Dickey-Fuller test for time-series autoregressiveness
 adf.test(dat1, alternative = "explosive")
 
