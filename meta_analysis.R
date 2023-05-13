@@ -13,7 +13,7 @@ dat <- escalc(measure = "RR", ai = tpos, bi = tneg, ci = cpos, di = cneg
 res <- rma(ai = tpos, bi = tneg, ci = cpos, di = cneg, data = dat,  measure = "RR")
 confint(res)
 
-## plot output using the package's forest()
+## make a forest plot
 forest(res, slab = paste(dat$author, dat$year, sep = ", ")
        , xlim = c(-16, 6)
        , at = log(c(0.05, 0.25, 1, 4))
@@ -32,5 +32,13 @@ par(op)
 ## fitting a mixed-effects model using year and latitude of study's location
 res <- rma(yi, vi, mods = cbind(ablat, year), data = dat)
 
+## make a QQ plot
+qqnorm(res)
+
+## make a funnel plot
+funnel(res, refline = 0)
+
+## predict new values
 predict(res, newmods = cbind(seq(from = 10, to = 60, by = 10), 1970)
         , transf = exp, addx = TRUE)
+
