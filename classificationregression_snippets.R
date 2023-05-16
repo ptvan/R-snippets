@@ -3,7 +3,7 @@
 ##########################
 ## using the naivebayes package
 library(naivebayes)
-library(tidyverse)
+library(dplyr)
 library(ggplot2)
 
 set.seed(1)
@@ -36,6 +36,29 @@ predict(nb, test, type = "prob")
 
 ## using the caret package
 library(caret)
+
+########
+# CART
+########
+set.seed(999)
+houses <- read.csv("~/working/datasets/cozycottage/cozycottage_data.csv") %>%
+                mutate(neighborhood = factor(neighborhood))
+
+trainIndex <- createDataPartition(houses$neighborhood, p = .8, 
+                                  list = FALSE, 
+                                  times = 1)
+training <- houses[trainIndex,]
+testing <- houses[-trainIndex,]
+
+fitControl <- trainControl(
+  method = "repeatedcv",
+  number = 10,
+  repeats = 10)
+
+gbmFit1 <- train(listed_price ~ ., data = training, 
+                 method = "gbm", 
+                 trControl = fitControl,
+                 verbose = FALSE)
 
 #####################################
 # Linear Discriminant Analysis (LDA)
