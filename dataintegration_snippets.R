@@ -29,11 +29,10 @@ names(sim.data)
 
 lapply(sim.data, dim)
 
-#########################
-# using the MOFA package
-#########################
-# NOTE: need to update below to MOFA v2
-library(MOFA)
+#############
+# using MOFA2
+#############
+library(MOFA2)
 
 # simulate some data & create MOFA object
 N <- 100
@@ -47,26 +46,25 @@ colnames(view2) <- paste0("sample_",1:N)
 rownames(view1) <- paste0("feature",1:D1,"_view",1)
 rownames(view2) <- paste0("feature",1:D2,"_view",2)
 
-MOFAobject <- createMOFAobject(list("view1" = view1, "view2" = view2))
+MOFAobject <- create_mofa(list("view1" = view1, "view2" = view2))
 print(MOFAobject)
-plotDataOverview(MOFAobject)
+plot_data_overview(MOFAobject)
 
 # get options
-data_opts <- getDefaultDataOptions()
-model_opts <- getDefaultModelOptions(MOFAobject)
-train_opts <- getDefaultTrainOptions()
+data_opts <- get_default_data_options(MOFAobject)
+model_opts <- get_default_model_options(MOFAobject)
+train_opts <- get_default_training_options(MOFAobject)
 
 # build & train MOFA object
-MOFAobject <- prepareMOFA(
+MOFAobject <- prepare_mofa(
   object = MOFAobject,
-  DataOptions  = data_opts,
-  ModelOptions =  model_opts,
-  TrainOptions =  train_opts
+  data_options  = data_opts,
+  model_options =  model_opts,
+  training_options =  train_opts
 )
 
-outfile = "MOFAtest.hdf5"
-MOFAobject.trained <- runMOFA(MOFAobject, outfile)
-
+outfile <- "MOFAtest.hdf5"
+MOFAobject.trained <- run_mofa(MOFAobject, outfile)
 
 ############################
 # USING MixOmics
