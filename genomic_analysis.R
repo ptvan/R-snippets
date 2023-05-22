@@ -15,12 +15,31 @@ getGeneSummary(TCGA_data)
 getClinicalData(TCGA_data)
 getFields(TCGA_data)
 
+#####################
+## DATA SUBSETTING ##
+#####################
+
+TCGA_single_gene <- subsetMaf(TCGA_data, genes = "FLT3")
+TCGA_single_sample_df <- subsetMaf(TCGA_data, 
+                                tsb = "TCGA-AB-3009",
+                                query = "Variant_Classification == 'Missense_Mutation'",
+                                mafObj = FALSE
+                                )
+TCGA_survivor_samples_df <- subsetMaf(TCGA_data, 
+                                   clinQuery = "Overall_Survival_Status == '1'",
+                                   mafObj = FALSE
+)
+
+
 ##############
 ## PLOTTING ##
 ##############
 
-# summary plot
+# multi-panel summary plot
 plotmafSummary(TCGA_data, rmOutlier = TRUE, addStat = 'median', dashboard = TRUE, titvRaw = FALSE)
+
+# simple barplot of mutation types
+mafbarplot(TCGA_data, includeCN = TRUE)
 
 # oncoplots/waterfall plots
 oncoplot(TCGA_data, top = 20)
@@ -32,4 +51,6 @@ rainfallPlot(maf = BRCA_data, detectChangePoints = TRUE, pointSize = 0.4)
 # this throws an error since no VAF was calculated for the BRCA MAF:
 # plotVaf(TCGA_data)
 plotVaf(TCGA_data, vafCol = 'i_TumorVAF_WU')
+
+
 
