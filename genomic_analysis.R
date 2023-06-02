@@ -1,5 +1,8 @@
 library(maftools)
 library(GenVisR)
+library(MutationalPatterns)
+library(BSgenome)
+
 
 ## load in MAFs file and associated annotations
 TCGA_LAML_MAF <- system.file('extdata', 'tcga_laml.maf.gz', package = 'maftools')  
@@ -52,5 +55,27 @@ rainfallPlot(maf = BRCA_data, detectChangePoints = TRUE, pointSize = 0.4)
 # plotVaf(TCGA_data)
 plotVaf(TCGA_data, vafCol = 'i_TumorVAF_WU')
 
+## load in VCF files as GRanges via MutationalPatterns
+ref_genome <- "BSgenome.Hsapiens.UCSC.hg19"
+library(ref_genome, character.only = TRUE)
 
+vcf_files <- list.files(system.file("extdata", package = "MutationalPatterns"),
+                        pattern = "sample.vcf", full.names = TRUE
+)
 
+# tissue type as a vector for plotting
+vcf_metadata <- c(
+  "colon1", "colon2", "colon3",
+  "intestine1", "intestine2", "intestine3",
+  "liver1", "liver2", "liver3"
+)
+
+grl <- read_vcfs_as_granges(vcf_files, vcf_metadata, ref_genome)
+
+# extract subtypes, create a column to facet by
+subtype_counts <- mut_type_occurrences(grl, ref_genome) 
+
+plot_spectrum(subtype_counts, 
+              by = vcf_metadata, 
+              indv_points = TRUE,
+              error_bars = 'none')
