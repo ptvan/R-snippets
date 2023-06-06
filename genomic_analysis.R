@@ -2,7 +2,7 @@ library(maftools)
 library(GenVisR)
 library(MutationalPatterns)
 library(BSgenome)
-
+library(NMF)
 
 ## load in MAFs file and associated annotations
 TCGA_LAML_MAF <- system.file('extdata', 'tcga_laml.maf.gz', package = 'maftools')  
@@ -72,10 +72,14 @@ vcf_metadata <- c(
 
 grl <- read_vcfs_as_granges(vcf_files, vcf_metadata, ref_genome)
 
-# extract subtypes, create a column to facet by
+# extract subtypes
 subtype_counts <- mut_type_occurrences(grl, ref_genome) 
 
+# facet by vector of metadata
 plot_spectrum(subtype_counts, 
               by = vcf_metadata, 
               indv_points = TRUE,
               error_bars = 'none')
+
+
+mutation_matrix <- mut_matrix(vcf_list = grl, ref_genome = ref_genome)
