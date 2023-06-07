@@ -1,6 +1,8 @@
 library(maftools)
 library(GenVisR)
 library(MutationalPatterns)
+library(GenomicFeatures)
+library("TxDb.Hsapiens.UCSC.hg19.knownGene")
 library(BSgenome)
 library(NMF)
 
@@ -63,6 +65,15 @@ mutation_matrix_ext_context <- mut_matrix(vcf_list = grl,
                                           ref_genome = ref_genome, 
                                           extension = 2)
 
+## Strand bias
+genes_hg19 <- genes(TxDb.Hsapiens.UCSC.hg19.knownGene)
+strandedness <- mut_strand(grl[[1]], genes_hg19)
+mutation_matrix_strand <- mut_matrix_stranded(grl, ref_genome, genes_hg19)
+
+# extract counts and perform significance testing
+strand_counts <- strand_occurrences(mutation_matrix_strand, by = vcf_metadata)
+strand_bias <- strand_bias_test(strand_counts)
+
 ##############
 ## PLOTTING ##
 ##############
@@ -92,6 +103,9 @@ plot_spectrum(subtype_counts,
 
 # plot trinucleotide spectrum, comparing across samples
 plot_96_profile(mutation_matrix[, c(1, 7)])
+
+# plot strand bias
+plot_192_profile(mutation_matrix_strand[, 1:2])
 
 # plot extended context spectrum as a heatmap, also comparing across samples
 plot_profile_heatmap(mutation_matrix_ext_context, by = vcf_metadata)
