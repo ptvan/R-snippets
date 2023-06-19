@@ -5,6 +5,7 @@ library(GenomicFeatures)
 library("TxDb.Hsapiens.UCSC.hg19.knownGene")
 library(BSgenome)
 library(NMF)
+library(dndscv)
 
 ## load in MAFs file and associated annotations
 TCGA_LAML_MAF <- system.file('extdata', 'tcga_laml.maf.gz', package = 'maftools')  
@@ -109,3 +110,30 @@ plot_192_profile(mutation_matrix_strand[, 1:2])
 
 # plot extended context spectrum as a heatmap, also comparing across samples
 plot_profile_heatmap(mutation_matrix_ext_context, by = vcf_metadata)
+
+#########################
+## CANCER DRIVER GENES ##
+#########################
+
+# unfortunately both TCGA_data and BRCA_data only contains SNPs
+driver_data <- BRCA_data@data %>%
+          dplyr::select(Chromosome,
+                 Start_Position,
+                 Reference_Allele,
+                 Tumor_Seq_Allele2,
+                 # Variant_Classification,
+                 # Variant_Type
+                 ) %>%
+          dplyr::rename(chr = Chromosome,
+                        pos = Start_Position,
+                        ref = Reference_Allele,
+                        mut = Tumor_Seq_Allele2) %>%
+          dplyr::mutate(sample = "Sample1")
+
+# so we just use the package's sample data instead...
+data("dataset_simbreast", package="dndscv")
+driver_data <- mutations
+dndsout <- dndscv(driver_data)
+
+# test for significant genes
+signif_genes_localmodel <- as.vector(dndsout$sel_loc$gene_name[dndsout$sel_loc$qall_loc<0.1])
