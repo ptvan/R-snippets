@@ -26,6 +26,10 @@ options(scipen=999)
 # disable scientific notation for a single value
 format("1000000000", scientific=F)
 
+# rank() assigns ranks to each element in a vector
+scores <- c(80, 60, 90, 75)
+ranking <- rank(scores) # returns "3 1 4 2"
+
 # bind a list of same-rank dfs into one 
 # much faster than base R's do.call(rbind, list_of_df)
 big_df <- data.table::rbindlist(list_of_dfs)
