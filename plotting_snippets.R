@@ -84,3 +84,12 @@ library(gghighlight)
 ggplot(d) +
   geom_line(aes(idx, value, colour = type)) +
   gghighlight(max(value) > 20)
+
+#### UpsetR plots UpSet plots (http://vcg.github.io/upset/)
+library(UpSetR)
+
+movies <- read.csv(system.file("extdata", "movies.csv", package = "UpSetR"), 
+                   header = T, sep = ";")
+upset(movies, nsets = 6, number.angles = 30, point.size = 3.5, line.size = 2, 
+      mainbar.y.label = "Genre Intersections", sets.x.label = "Movies Per Genre", 
+      text.scale = c(1.3, 1.3, 1, 1, 2, 0.75))
