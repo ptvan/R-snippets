@@ -6,6 +6,7 @@ library("TxDb.Hsapiens.UCSC.hg19.knownGene")
 library(BSgenome)
 library(NMF)
 library(dndscv)
+library(proast70.3)
 
 ## load in MAFs file and associated annotations
 TCGA_LAML_MAF <- system.file('extdata', 'tcga_laml.maf.gz', package = 'maftools')  
@@ -137,3 +138,11 @@ dndsout <- dndscv(driver_data)
 
 # test for significant genes
 signif_genes_localmodel <- as.vector(dndsout$sel_loc$gene_name[dndsout$sel_loc$qall_loc<0.1])
+
+#############################
+# DOSE-RESPONSE ANALYSIS
+##############################
+## Benchmark Dose Analysis using PROAST from https://www.rivm.nl/en/proast
+
+data(das11)
+f.proast(das11)
