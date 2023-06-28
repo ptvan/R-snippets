@@ -7,6 +7,7 @@ library(BSgenome)
 library(NMF)
 library(dndscv)
 library(proast70.3)
+library(sigminer)
 
 ## load in MAFs file and associated annotations
 TCGA_LAML_MAF <- system.file('extdata', 'tcga_laml.maf.gz', package = 'maftools')  
@@ -79,7 +80,6 @@ strand_bias <- strand_bias_test(strand_counts)
 ##############
 ## PLOTTING ##
 ##############
-
 ## multi-panel summary plot
 plotmafSummary(TCGA_data, rmOutlier = TRUE, addStat = 'median', dashboard = TRUE, titvRaw = FALSE)
 
@@ -115,7 +115,6 @@ plot_profile_heatmap(mutation_matrix_ext_context, by = vcf_metadata)
 #########################
 ## CANCER DRIVER GENES ##
 #########################
-
 # unfortunately both TCGA_data and BRCA_data only contains SNPs
 driver_data <- BRCA_data@data %>%
           dplyr::select(Chromosome,
@@ -141,8 +140,20 @@ signif_genes_localmodel <- as.vector(dndsout$sel_loc$gene_name[dndsout$sel_loc$q
 
 #############################
 # DOSE-RESPONSE ANALYSIS
-##############################
-## Benchmark Dose Analysis using PROAST from https://www.rivm.nl/en/proast
-
+#############################
+## Benchmark Dose Analysis using PROAST from https://www.rivm.nl/en/proast 
 data(das11)
 f.proast(das11)
+
+
+################################
+# MUTATIONAL SIGNATURE ANALYSIS
+################################
+laml <- read_maf(TCGA_LAML_MAF)
+
+laml_mut_sig <- sig_tally(
+  laml,
+  ref_genome = "BSgenome.Hsapiens.UCSC.hg19",
+  use_syn = TRUE, 
+  add_trans_bias = TRUE
+)
