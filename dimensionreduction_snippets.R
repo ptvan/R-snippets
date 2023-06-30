@@ -140,3 +140,23 @@ plot(sommodel, type="mapping", pchs=19)
 plot(sommodel, type="codes", pchs=19)
 plot(sommodel, type="changes")
 plot(sommodel, type="counts")
+
+####################### 
+# Nonnegative Matrix Factorization
+####################### 
+library(NMF)
+
+# example ExpressionSet with Sample phenotypic column removed
+data(esGolub)
+esGolub
+esGolub <- esGolub[1:200,]
+esGolub$Sample <- NULL
+
+# run NMF with rank 3
+nmf_out <- nmf(esGolub, 3)
+
+# fit the output
+nmf_fitted <- fitted(nmf_out)
+
+# get some quality metrics
+summary(nmf_fitted, target=esGolub)
