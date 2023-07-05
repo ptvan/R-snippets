@@ -159,4 +159,33 @@ nmf_out <- nmf(esGolub, 3)
 nmf_fitted <- fitted(nmf_out)
 
 # get some quality metrics
-summary(nmf_fitted, target=esGolub)
+summary(nmf_fitted, target = esGolub)
+
+####################### 
+# Linear Discriminate Analysis (LDA)
+####################### 
+library(klaR)
+library(ggord)
+
+indices <- sample(2, nrow(iris),
+              replace = TRUE,
+              prob = c(0.6, 0.4))
+
+training <- iris[indices == 1,]
+testing <- iris[indices == 2,]
+
+# train
+lda_train <- lda(Species~., training)
+
+# test
+lda_prediction <- predict(lda_train, training)
+
+# histogram of LDA1, good separation
+ldahist(data = lda_prediction$x[,1], g = training$Species)
+
+# histogram of LDA2, separation is not as good
+ldahist(data = lda_prediction$x[,2], g = training$Species)
+
+# additional diagnostic plots
+ggord(lda_train, training$Species, ylim = c(-10, 10))
+partimat(Species~., data = training, method = "lda")
