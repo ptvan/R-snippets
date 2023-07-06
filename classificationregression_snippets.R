@@ -64,21 +64,57 @@ gbmFit1 <- train(listed_price ~ ., data = training,
 # Linear Discriminant Analysis (LDA)
 ####################################
 library(MASS)
+library(ggord)
+
 r <- lda(formula = Species ~ .,
          data = iris,
          prior = c(1,1,1)/3)
 
 train <- sample(1:150, 75)
 
-plda = predict(object = r, # predictions
+plda <- predict(object = r, # predictions
                newdata = iris[-train, ])
 head(plda$class)
 ldahist(plda$x[,2], g = plda$class)
 
 # ggplot is a little nicer...
 irisProjection <- cbind(scale(as.matrix(iris[,-5]),scale=FALSE) %*% r$scaling,iris[,5,drop=FALSE])
-ggplot(data=irisProjection,aes(x=LD1,y=LD2,col=Species)) +
+ggplot(data = irisProjection, aes(x = LD1, y = LD2, col = Species)) +
  geom_point()  
+
+# this also counts as dimension reduction...
+indices <- sample(2, nrow(iris),
+                  replace = TRUE,
+                  prob = c(0.6, 0.4))
+
+training <- iris[indices == 1,]
+testing <- iris[indices == 2,]
+
+# train
+lda_train <- lda(Species~., training)
+
+# test
+lda_prediction <- predict(lda_train, training)
+
+# histogram of LDA1, good separation
+ldahist(data = lda_prediction$x[,1], g = training$Species)
+
+# histogram of LDA2, separation is not as good
+ldahist(data = lda_prediction$x[,2], g = training$Species)
+
+# additional diagnostic plots
+ggord(lda_train, training$Species, ylim = c(-10, 10))
+partimat(Species~., data = training, method = "lda")
+
+# check predicted vs. observed counts
+p1 <- predict(lda_train, training)$class
+training_table <- table(Predicted = p1, Actual = training$Species)
+
+p2 <- predict(lda_train, testing)$class
+testing_table <- table(Predicted = p2, Actual = testing$Species)
+
+# calculate accuracy
+sum(diag(training_table))/sum(training_table)
 
 ##########################
 # XGBOOST
