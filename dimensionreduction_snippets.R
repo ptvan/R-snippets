@@ -161,3 +161,8 @@ nmf_fitted <- fitted(nmf_out)
 # get some quality metrics
 summary(nmf_fitted, target = esGolub)
 
+#####################################
+# Linear Discriminant Analysis (LDA)
+####################################
+# see the corresponding section in classificationregression_snippets.R
+

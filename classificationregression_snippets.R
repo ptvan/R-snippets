@@ -64,6 +64,7 @@ gbmFit1 <- train(listed_price ~ ., data = training,
 # Linear Discriminant Analysis (LDA)
 ####################################
 library(MASS)
+library(klaR)
 library(ggord)
 
 r <- lda(formula = Species ~ .,
