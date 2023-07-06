@@ -8,7 +8,7 @@ library(ggplot2)
 # HTRU2 from the UCI ML repository
 # https://archive.ics.uci.edu/ml/datasets/HTRU2
 dat <- read.csv("~/working/datasets/HTRU.csv")
-colnames(dat) <- c(paste0("var", 1:(ncol(dat)-1)), "class")
+colnames(dat) <- c(paste0("var", 1:(ncol(dat) - 1)), "class")
 dat <- dat[sample(nrow(dat),5000),]
 
 
@@ -18,31 +18,31 @@ dat <- dat[sample(nrow(dat),5000),]
 # needs a distance structure
 # k is number of dimensions
 d <- dist(dat)
-mds <- cmdscale(d, eig=TRUE, k=2)
-plot(mds$points[,1], mds$points[,2], xlab="Coordinate 1", ylab="Coordinate 2",
-     main="metric MDS", type="n")
-text(mds$points[,1], mds$points[,2], labels = row.names(dat), cex=.7) 
+mds <- cmdscale(d, eig = TRUE, k = 2)
+plot(mds$points[,1], mds$points[,2], xlab = "Coordinate 1", ylab = "Coordinate 2",
+     main = "metric MDS", type = "n")
+text(mds$points[,1], mds$points[,2], labels = row.names(dat), cex = 0.7) 
 
 ################# 
 # non-metric MDS
 ################# 
 library(MASS)
-nmds <- isoMDS(d, k=2)
-plot(nmds$points[,1], nmds$points[,2], xlab="Coordinate 1", ylab="Coordinate 2",
-     main="non-metric MDS", type="n")
-text(nmds$points[,1], nmds$points[,2], labels = row.names(dat), cex=.7) 
+nmds <- isoMDS(d, k = 2)
+plot(nmds$points[,1], nmds$points[,2], xlab = "Coordinate 1", ylab = "Coordinate 2",
+     main = "non-metric MDS", type = "n")
+text(nmds$points[,1], nmds$points[,2], labels = row.names(dat), cex = .7) 
 
 
 ###########
 # T-SNE
 ###########
 library(Rtsne)
-tsne_out <- Rtsne(dat[,c(1:8)],perplexity=30,theta=0.0) 
+tsne_out <- Rtsne(dat[,c(1:8)], perplexity = 30,theta = 0.0) 
 
 tsne_out <- tsne_out$Y %>%
           as.data.frame() %>% 
           set_colnames(c("X","Y")) %>%
-          inset("class", value=dat$class) %>%
+          inset("class", value = dat$class) %>%
           mutate(class = as.factor(class))
 
 #######
@@ -52,18 +52,18 @@ library(uwot)
 umap_out <- umap(dat, init = "spca") %>%
           as.data.frame() %>% 
           set_colnames(c("X","Y")) %>%
-          inset("class", value=dat$class) %>%
+          inset("class", value = dat$class) %>%
           mutate(class = as.factor(class))
 
 ggplot(umap_out) +
-      aes(x=X, y=Y, col=class) +
+      aes(x = X, y = Y, col = class) +
       geom_point()
 
 ############
 # KERNEL PCA
 ############
 library(kernlab) 
-kpca_out <- kpca(dat, features=2) 
+kpca_out <- kpca(dat, features = 2) 
 rotated(kpca_out)
 
 
@@ -72,7 +72,7 @@ rotated(kpca_out)
 ###########
 library(MASS)
 sammon_out <- sammon(dist(dat[,-180]))
-plot(sammon_out$points, type="n")
+plot(sammon_out$points, type = "n")
 text(sammon_out$points, labels = as.character(1:nrow(dat[,-180])))
 
 
@@ -125,7 +125,7 @@ library(diffusionMap)
 
 # works on a `dist` object
 d <- dist(dat[,c(1:8)])
-dmap <- diffuse(D, eps.val=.1) 
+dmap <- diffuse(D, eps.val = .1) 
 plot(dmap)
 
 
@@ -134,16 +134,16 @@ plot(dmap)
 ####################### 
 library(kohonen)
 set.seed(100)
-grd <- somgrid(xdim=10, ydim=10, topo="hexagonal")
+grd <- somgrid(xdim = 10, ydim = 10, topo = "hexagonal")
 sommodel <- som(data, grd)
-plot(sommodel, type="mapping", pchs=19)
-plot(sommodel, type="codes", pchs=19)
-plot(sommodel, type="changes")
-plot(sommodel, type="counts")
+plot(sommodel, type = "mapping", pchs = 19)
+plot(sommodel, type = "codes", pchs = 19)
+plot(sommodel, type = "changes")
+plot(sommodel, type = "counts")
 
-####################### 
+################################### 
 # Nonnegative Matrix Factorization
-####################### 
+################################### 
 library(NMF)
 
 # example ExpressionSet with Sample phenotypic column removed
@@ -189,3 +189,13 @@ ldahist(data = lda_prediction$x[,2], g = training$Species)
 # additional diagnostic plots
 ggord(lda_train, training$Species, ylim = c(-10, 10))
 partimat(Species~., data = training, method = "lda")
+
+# check predicted vs. observed counts
+p1 <- predict(lda_train, training)$class
+training_table <- table(Predicted = p1, Actual = training$Species)
+
+p2 <- predict(lda_train, testing)$class
+testing_table <- table(Predicted = p2, Actual = testing$Species)
+
+# calculate accuracy
+sum(diag(training_table))/sum(training_table)
