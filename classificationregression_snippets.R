@@ -154,8 +154,9 @@ xgb.plot.shap(agaricus.test$data, model = bst_rf, features = "odor=none")
 # Support Vector Machines
 #########################
 library(e1071)
+library(mlbench)
 
-gauss2D <- mlbench.2dnormals(n=10000, cl=2, r=1)
+gauss2D <- mlbench.2dnormals(n = 10000, cl = 2, r = 1)
 
 train <- data.frame(cbind(gauss2D$x[1:8000,], gauss2D$classes[1:8000]))
 colnames(train) <- c("X1","X2", "y")
@@ -164,24 +165,24 @@ test <- data.frame(cbind(gauss2D$x[8001:10000,], gauss2D$classes[8001:10000]))
 colnames(test) <- c("X1","X2", "y")
 
 ### using linear kernel
-cl_lin <- svm(y~., data=train,  type="C-classification", kernel='linear', scale=TRUE)
+cl_lin <- svm(y~., data=train,  type = "C-classification", kernel = 'linear', scale = TRUE)
 pred_lin <- predict(cl_lin, newdata = test) 
 
 plot(cl_lin, train)
 plot(cl_lin, test)
 
 ### using radial kernel
-cl_rbf <- svm(y~., data=train, type="C-classification", kernel='radial')
+cl_rbf <- svm(y~., data = train, type = "C-classification", kernel = 'radial')
 pred_rbf <- predict(cl_rbf, newdata = test)
+
+plot(cl_rbf, train)
+plot(cl_lin, test)
 
 # confusion matrix
 table(predicted = pred_rbf, actual = test$y)
 
 # misclassification rate
-mean(pred_rbf != test$y)*100
-
-plot(cl_rbf, train)
-
+mean(pred_rbf != test$y) * 100
 
 #################### 
 # Tree-based methods
@@ -205,43 +206,46 @@ BreastCancer$Bare.nuclei <- as.numeric(BreastCancer$Bare.nuclei)
 # randomForest needs complete cases
 BreastCancer <- BreastCancer[which(complete.cases(BreastCancer)),]
 
-fit <- rpart(Class ~ Cell.size + Cl.thickness + Marg.adhesion + Cell.shape + Mitoses + Epith.c.size + Bl.cromatin + Normal.nucleoli + Bare.nuclei, method="class", data=BreastCancer)
+fit <- rpart(Class ~ Cell.size + Cl.thickness + Marg.adhesion + Cell.shape + Mitoses + Epith.c.size + Bl.cromatin + Normal.nucleoli + Bare.nuclei,
+             method = "class", data = BreastCancer)
+
 printcp(fit)
 plotcp(fit)
 plot(fit, uniform=TRUE, main="breast cancer classification")
 text(fit, use.n=TRUE, all=TRUE, cex=.8)
 
 # prune the forest
-pfit<- prune(fit, cp=fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"])
-plot(pfit, uniform=TRUE,
-     main="breast cancer classification, pruned")
-text(pfit, use.n=TRUE, all=TRUE, cex=.8)
+pfit <- prune(fit, cp=fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"])
+plot(pfit, 
+     uniform = TRUE,
+     main = "breast cancer classification, pruned")
+text(pfit, use.n = TRUE, all = TRUE, cex = 0.8)
 
 ### classifying BreastCancer data using random forest
 library(randomForest)
-rffit <- randomForest(Class ~ Cell.size + Cl.thickness + Marg.adhesion + Cell.shape + Mitoses + Epith.c.size + Bl.cromatin + Normal.nucleoli + Bare.nuclei, data=BreastCancer)
+rffit <- randomForest(Class ~ Cell.size + Cl.thickness + Marg.adhesion + Cell.shape + Mitoses + Epith.c.size + Bl.cromatin + Normal.nucleoli + Bare.nuclei, 
+                      data = BreastCancer)
 importance(rffit)
-
 
 
 #########################
 # Partial Least Squares
 #########################
-library(mlbench)
 library(pls)
 
 ### regression so response must be continuous, corrected median value from BostonHousing2 in this case
 # when ncomp is not specified, the maximum number is used
-plsfit <- plsr(cmedv ~ lon + lat + crim + indus + nox + rm + age + dis + ptratio , data=BostonHousing2, validation="LOO")
+plsfit <- plsr(cmedv ~ lon + lat + crim + indus + nox + rm + age + dis + ptratio , 
+               data = BostonHousing2, validation = "LOO")
 
 # plot Root Mean Squared Error of Prediction vs. no. of components
-plot(RMSEP(plsfit), legendpos="topright")
+plot(RMSEP(plsfit), legendpos = "topright")
 
 # plot cross-validated prediction vs. observed values
 plot(plsfit, ncomp = 2, asp = 1, line = TRUE)
 
 # plot loadings
-plot(plsfit, "loadings", comps=1:2, legendpos="topright")
+plot(plsfit, "loadings", comps = 1:2, legendpos = "topright")
 
 # extract explained variances
 explvar(plsfit)
