@@ -11,7 +11,6 @@ dat <- read.csv("~/working/datasets/HTRU.csv")
 colnames(dat) <- c(paste0("var", 1:(ncol(dat) - 1)), "class")
 dat <- dat[sample(nrow(dat),5000),]
 
-
 ##########################
 # classical (metric) MDS
 ##########################
@@ -24,13 +23,13 @@ plot(mds$points[,1], mds$points[,2], xlab = "Coordinate 1", ylab = "Coordinate 2
 text(mds$points[,1], mds$points[,2], labels = row.names(dat), cex = 0.7) 
 
 ################# 
-# non-metric MDS
+# non-parametric MDS
 ################# 
 library(MASS)
 nmds <- isoMDS(d, k = 2)
 plot(nmds$points[,1], nmds$points[,2], xlab = "Coordinate 1", ylab = "Coordinate 2",
      main = "non-metric MDS", type = "n")
-text(nmds$points[,1], nmds$points[,2], labels = row.names(dat), cex = .7) 
+text(nmds$points[,1], nmds$points[,2], labels = row.names(dat), cex = 0.7) 
 
 
 ###########
@@ -125,7 +124,7 @@ library(diffusionMap)
 
 # works on a `dist` object
 d <- dist(dat[,c(1:8)])
-dmap <- diffuse(D, eps.val = .1) 
+dmap <- diffuse(D, eps.val = 0.1) 
 plot(dmap)
 
 
@@ -163,6 +162,6 @@ summary(nmf_fitted, target = esGolub)
 
 #####################################
 # Linear Discriminant Analysis (LDA)
-####################################
+#####################################
 # see the corresponding section in classificationregression_snippets.R
 

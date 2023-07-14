@@ -105,7 +105,7 @@ ldahist(data = lda_prediction$x[,2], g = training$Species)
 
 # additional diagnostic plots
 ggord(lda_train, training$Species, ylim = c(-10, 10))
-partimat(Species~., data = training, method = "lda")
+partimat(Species ~ ., data = training, method = "lda")
 
 # check predicted vs. observed counts
 p1 <- predict(lda_train, training)$class
@@ -165,14 +165,14 @@ test <- data.frame(cbind(gauss2D$x[8001:10000,], gauss2D$classes[8001:10000]))
 colnames(test) <- c("X1","X2", "y")
 
 ### using linear kernel
-cl_lin <- svm(y~., data=train,  type = "C-classification", kernel = 'linear', scale = TRUE)
+cl_lin <- svm(y ~ ., data=train,  type = "C-classification", kernel = 'linear', scale = TRUE)
 pred_lin <- predict(cl_lin, newdata = test) 
 
 plot(cl_lin, train)
 plot(cl_lin, test)
 
 ### using radial kernel
-cl_rbf <- svm(y~., data = train, type = "C-classification", kernel = 'radial')
+cl_rbf <- svm(y ~ ., data = train, type = "C-classification", kernel = 'radial')
 pred_rbf <- predict(cl_rbf, newdata = test)
 
 plot(cl_rbf, train)
