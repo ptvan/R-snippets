@@ -2,6 +2,8 @@ library(boot)
 library(nptest)
 library(broom)
 
+## Bootstrap
+
 set.seed(1)
 
 # bootstrap a point statistic (trimmed mean in this case)
@@ -27,3 +29,10 @@ lm_reps <- boot(mtcars,
      )
 
 lm_reps$t0
+
+## Permutation Test
+library(lmPerm)
+
+data(CC164)
+
+summary(lmp(y ~ N * P, data = CC164, perm="SPR"))
