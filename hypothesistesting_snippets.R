@@ -76,3 +76,8 @@ A_vs_B_fisher <- fisher.test(counts_tbl[c(1,2),])
 ### Augmented Dickey-Fuller test for time-series autoregressiveness
 adf.test(dat1, alternative = "explosive")
 
+# Comparing MFs given Mutation Depth, Total Depth and sample group
+glm(Mut Depth ~ group, family = quasipoisson(), offset = log(Total Depth))
+
+
+
