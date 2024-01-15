@@ -6,5 +6,10 @@ library(SnowballC)
 library(janeaustenr)
 library(quanteda)
 
-mansfieldpark %>%
-corpus()
+## generate a corpus of Jane Austen's Mansfield Park which is a character vector
+# if called on data.frame, needs `text_field` param 
+mp_corpus <- corpus(mansfieldpark)
+
+## tokenize and view tokens in context
+mp_tokens <- tokens(mp_corpus, remove_punct = TRUE)
+mp_love <- kwic(mp_tokens, pattern = "love")
