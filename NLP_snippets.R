@@ -20,3 +20,9 @@ mp_ngrams <-  tokens_ngrams(mp_tokens, n = 2:4)
 
 ## create Document Feature Matrix (DFM)
 mp_dfm <- dfm(mp_tokens)
+topfeatures(mp_dfm)
+
+
+## create Feature Co-occurrence Matrix (FCM)
+mp_fcm <- fcm(mp_dfm)
+topfeatures(mp_fcm)
