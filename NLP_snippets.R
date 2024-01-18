@@ -5,6 +5,7 @@ library(tm)
 library(SnowballC)
 library(janeaustenr)
 library(quanteda)
+library(quanteda.textstats)
 
 ## generate a corpus of Jane Austen's Mansfield Park which is a character vector
 # if called on data.frame, needs `text_field` param 
@@ -22,7 +23,14 @@ mp_ngrams <-  tokens_ngrams(mp_tokens, n = 2:4)
 mp_dfm <- dfm(mp_tokens)
 topfeatures(mp_dfm)
 
-
 ## create Feature Co-occurrence Matrix (FCM)
 mp_fcm <- fcm(mp_dfm)
 topfeatures(mp_fcm)
+
+## descriptive stats
+
+# word frequency
+mp_freq <- textstat_frequency(mp_dfm, n = 5)
+
+# lexical diversity
+mp_lexdiv <-textstat_lexdiv(mp_dfm)
