@@ -56,3 +56,18 @@ dfm_speakers <- dfm_speakers %>%
 tstat_dist <- as.dist(textstat_dist(dfm_speakers))
 speaker_clust <- hclust(tstat_dist)
 plot(speaker_clust)
+
+# tokenize
+sotu_tokens <- tokens(data_corpus_sotu, remove_punct = TRUE)
+phrases <- c("united", "union")
+sotu_tokens_keep <- tokens_keep(sotu_tokens, phrases)
+
+# apply dictionary
+data_dictionary_LSD2015_pos_neg <- data_dictionary_LSD2015[1:2]
+sotu_tokens_keep_posneg <- tokens_lookup(sotu_tokens_keep, dictionary = data_dictionary_LSD2015_pos_neg)
+
+# group by speaker
+sotu_posneg_dfm <- dfm(sotu_tokens_keep_posneg) %>% 
+  dfm_group(groups = dfmat_sotu@docvars$President)
+
+as.data.frame(sotu_posneg_dfm)
