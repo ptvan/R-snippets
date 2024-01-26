@@ -1,5 +1,6 @@
 library(dplyr) 
-library(tidytext) 
+library(tidytext)
+library(textdata)
 library(topicmodels) 
 library(tm) 
 library(SnowballC)
@@ -35,6 +36,12 @@ mp_freq <- textstat_frequency(mp_dfm, n = 5)
 
 # lexical diversity
 mp_lexdiv <- textstat_lexdiv(mp_dfm)
+
+# topic models
+mp_dtm <- DocumentTermMatrix(mp_corpus, 
+                   control = list(stemming = TRUE, stopwords = TRUE, minWordLength = 3, removeNumbers = TRUE, removePunctuation = TRUE))
+
+
 
 ## use US Presidents State of the Union address corpus
 # tokenize
