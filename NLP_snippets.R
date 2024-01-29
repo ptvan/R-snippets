@@ -78,3 +78,26 @@ sotu_posneg_dfm <- dfm(sotu_tokens_keep_posneg) %>%
   dfm_group(groups = dfmat_sotu@docvars$President)
 
 as.data.frame(sotu_posneg_dfm)
+
+## modelling topics on AssociatedPress data
+data("AssociatedPress")
+ap_lda <- LDA(AssociatedPress, 
+              k = 3, 
+              control = list(seed = 31415))
+
+# extract beta, per-topic-per-word probabilities
+ap_topics <- tidy(ap_lda, matrix = "beta")
+
+# extract top terms, group them by topics and plot
+ap_top_terms <- ap_topics %>%
+  group_by(topic) %>%
+  slice_max(beta, n = 10) %>% 
+  ungroup() %>%
+  arrange(topic, -beta)
+
+ap_top_terms %>%
+  mutate(term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  scale_y_reordered()
