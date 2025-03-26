@@ -1,8 +1,12 @@
 library(validate)
 library(simputation)
 library(lubridate)
+library(admiral)
 
-## data validation
+
+####################
+# Data validation
+####################
 data(women)
 cf <- check_that(women, height > 0, weight > 0, height/weight > 0.5)
 summary(cf)
@@ -48,4 +52,5 @@ tail(steps_missing)
 # inpute by median weekNumber 
 steps_imputed_weekNumber <- impute_median(steps_missing, dailySteps ~ weekNumber)
 tail(steps_imputed_weekNumber)
-              
+
+
