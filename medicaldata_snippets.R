@@ -11,10 +11,43 @@ library(lubridate)
 library(stringr)
 library(dplyr)
 
-# generate some ADSL from the example SDTM
+# extract the provided example ADSL
+adsl <- admiral::admiral_adsl
+
+# alternately, generate some ADSL from the example SDTM
 dm <- pharmaversesdtm::dm %>%
       convert_blanks_to_na() %>%
       select(-DOMAIN)
+
+# merge the ADSL to EX using `STUDYID` and `USUBJID`
+# for a subset of variables
+
+adsl_vars <- exprs(TRTSDT, TRTSDTM, TRTEDT, TRTEDTM)
+adex <- derive_vars_merged(
+  ex,
+  dataset_add = adsl,
+  new_vars = adsl_vars,
+  by_vars = get_admiral_option("subject_keys")
+)
+
+# derive datetime and analysis day:
+adex <- derive_vars_dt(adex, new_vars_prefix = "AST", dtc = EXSTDTC)
+adex <- derive_vars_dt(adex, new_vars_prefix = "AEN", dtc = EXENDTC)
+
+adex <- derive_vars_dtm(
+  adex,
+  dtc = EXSTDTC,
+  highest_imputation = "M",
+  new_vars_prefix = "AST"
+)
+
+adex <- derive_vars_dtm(
+  adex,
+  dtc = EXENDTC,
+  highest_imputation = "M",
+  date_imputation = "last",
+  new_vars_prefix = "AEN"
+)
 
 ###########################################################
 # Observational Medical Outcomes Partnership (OMOP) data
