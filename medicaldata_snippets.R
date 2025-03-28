@@ -19,6 +19,8 @@ dm <- pharmaversesdtm::dm %>%
       convert_blanks_to_na() %>%
       select(-DOMAIN)
 
+ae <- pharmaversesdtm::ae
+
 # merge the ADSL to EX using `STUDYID` and `USUBJID`
 # for a subset of variables
 
@@ -48,6 +50,47 @@ adex <- derive_vars_dtm(
   date_imputation = "last",
   new_vars_prefix = "AEN"
 )
+
+## derive durations of adverse events
+# merge by new variables
+adsl_vars <- exprs(TRTSDT, TRTEDT, TRT01A, TRT01P, DTHDT, EOSDT)
+
+adae <- derive_vars_merged(
+  ae,
+  dataset_add = adsl,
+  new_vars = adsl_vars,
+  by = exprs(STUDYID, USUBJID)
+)
+
+# reimpute time and date
+adae <- adae %>%
+  derive_vars_dtm(
+    dtc = AESTDTC,
+    new_vars_prefix = "AST",
+    highest_imputation = "M",
+    min_dates = exprs(TRTSDT)
+  ) %>%
+  derive_vars_dtm(
+    dtc = AEENDTC,
+    new_vars_prefix = "AEN",
+    highest_imputation = "M",
+    date_imputation = "last",
+    time_imputation = "last",
+    max_dates = exprs(DTHDT, EOSDT)
+  ) %>%
+  derive_vars_dtm_to_dt(exprs(ASTDTM, AENDTM)) %>%
+  derive_vars_dy(
+    reference_date = TRTSDT,
+    source_vars = exprs(ASTDT, AENDT)
+  )
+
+adae <- adae %>%
+  derive_vars_duration(
+    new_var = ADURN,
+    new_var_unit = ADURU,
+    start_date = ASTDT,
+    end_date = AENDT
+  )
 
 ###########################################################
 # Observational Medical Outcomes Partnership (OMOP) data
