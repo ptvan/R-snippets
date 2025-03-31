@@ -51,7 +51,7 @@ adex <- derive_vars_dtm(
   new_vars_prefix = "AEN"
 )
 
-## derive durations of adverse events
+## working with adverse events
 # merge by new variables
 adsl_vars <- exprs(TRTSDT, TRTEDT, TRT01A, TRT01P, DTHDT, EOSDT)
 
@@ -84,6 +84,7 @@ adae <- adae %>%
     source_vars = exprs(ASTDT, AENDT)
   )
 
+# derive adverse event duration
 adae <- adae %>%
   derive_vars_duration(
     new_var = ADURN,
@@ -91,6 +92,10 @@ adae <- adae %>%
     start_date = ASTDT,
     end_date = AENDT
   )
+
+# derive planned and actual treatments
+adae <- mutate(adae, TRTP = TRT01P, TRTA = TRT01A)
+
 
 ###########################################################
 # Observational Medical Outcomes Partnership (OMOP) data
@@ -127,7 +132,7 @@ cdm$person %>%
   inner_join(cdm$concept, by=c("gender_concept_id" = "concept_id")) %>%
   select(year_of_birth, concept_name, n) 
   
-# the dplyr call above is just wrapping SQL
+# the dplyr call above is just wrapping SQL, which we can expose
 gender_by_year_SQL <- cdm$person %>%
   group_by(year_of_birth, gender_concept_id) %>%
   summarize(n = n(), .groups= "drop") %>%
