@@ -249,3 +249,16 @@ plot(plsfit, "loadings", comps = 1:2, legendpos = "topright")
 
 # extract explained variances
 explvar(plsfit)
+
+
+###################
+# Model Evaluation
+###################
+library(lime)
+
+# explain the LDA data and model from above using LIME
+lime_explainer <- lime(train, lda_train)
+explanation <- explain(train, lda_prediction)
+
+# explore the explanation
+plot_features(explanation)

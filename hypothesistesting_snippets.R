@@ -26,12 +26,12 @@ kruskal.test(dat1, dat2)
 cor.test(dat1, dat2, method="kendall")
 
 ## ANOVA
-anovaOut <- aov(value ~ group, data=df)
+anovaOut <- aov(value ~ group, data = df)
 summary(anovaOut)
 
-mod <- lm(conformity ~ fcategory*partner.status, data=Moore,
-          contrasts=list(fcategory=contr.sum, partner.status=contr.sum))
-Anova(mod, type="II", test.statistic ="Wald")
+mod <- lm(conformity ~ fcategory*partner.status, data = Moore,
+          contrasts = list(fcategory = contr.sum, partner.status = contr.sum))
+Anova(mod, type="II", test.statistic = "Wald")
 
 ### Pearson's Chi-Squared
 tbl <- table(survey$Smoke, survey$Exer) 
@@ -78,6 +78,3 @@ adf.test(dat1, alternative = "explosive")
 
 # Comparing MFs given Mutation Depth, Total Depth and sample group
 glm(Mut Depth ~ group, family = quasipoisson(), offset = log(Total Depth))
-
-
-
