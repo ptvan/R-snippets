@@ -8,9 +8,6 @@ library(NMF)
 library(dndscv)
 library(proast70.3)
 library(sigminer)
-library(GenomicRanges)
-library(HiCExperiment)
-library(InteractionSet)
 
 ## load in MAF files and associated annotations
 TCGA_LAML_MAF <- system.file('extdata', 'tcga_laml.maf.gz', package = 'maftools')  
