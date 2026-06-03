@@ -77,7 +77,6 @@ hg38 <- BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38
 human_compts <- getCompartments(human_microC, genome = hg38)
 
 topologicalFeatures(human_compts, "compartments")
-
 metadata(human_compts)$eigens
 
 ## export eigenvector as a bigwig file 
@@ -86,5 +85,22 @@ coverage(metadata(human_compts)$eigens, weight = 'eigen') |> export('microC_eige
 ## export compartments as GFF file
 topologicalFeatures(human_compts, "compartments") |> export('microC_compartments.gff3')
 
+## run HiContacts::getDiamondInsulation(), average interaction frequency in a sliding window
+bpparam <- SerialParam(progressbar = FALSE)
+human_microC <- zoom(human_microC, 5000) |> 
+  refocus('chr17:60000001-83257441') |>
+  getDiamondInsulation(window_size = 100000, BPPARAM = bpparam) |> 
+  getBorders()
+
+topologicalFeatures(human_microC, "borders")
+metadata(human_microC)$insulation
+
+## export insulation scores as bigWig file
+coverage(metadata(human_microC)$insulation, weight = 'insulation') |> export('microC_insulation.bw')
+
+## export borders as BED file
+topologicalFeatures(human_microC, "borders") |> export('microC_borders.bed')
+
 ## `observed vs. expected` interaction scores, aka "saddle plots"
 plotSaddle(human_compts, nbins = 25, BPPARAM = SerialParam(progressbar = FALSE))
+
